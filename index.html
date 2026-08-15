@@ -174,27 +174,65 @@
   .nowbar {
     height: 72px; flex: 0 0 auto;
     background: var(--bg-void); border-top: 1px solid var(--border);
-    display: flex; align-items: center; padding: 0 16px; gap: 14px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 10px;
   }
+  .now-left { display: flex; align-items: center; gap: 12px; width: 220px; flex: none; min-width: 0; }
   .now-art { width: 46px; height: 46px; border-radius: 4px; flex: none; background: linear-gradient(135deg,#4a3a2a,#8a6a3a); }
-  .now-title { font-size: 13px; font-weight: 600; }
-  .now-artist { font-size: 11.5px; color: var(--text-tertiary); }
-  .now-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .transport { display: flex; align-items: center; gap: 16px; color: var(--text-secondary); }
-  .play-circle {
-    width: 32px; height: 32px; border-radius: 50%; background: #fff; color: #000;
-    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  .now-meta { min-width: 0; }
+  .now-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .now-artist { font-size: 11.5px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .np-icon-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
+    color: var(--text-secondary); flex: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; position: relative;
   }
-  .scrub { width: 380px; height: 4px; border-radius: 2px; background: var(--bg-active); position: relative; }
-  .scrub::after { content: ""; position: absolute; inset: 0 34% 0 0; background: var(--text-secondary); border-radius: 2px; }
-  .now-right { display: flex; align-items: center; gap: 10px; }
+  .np-icon-btn:hover { color: var(--text-primary); }
+  .np-icon-btn.liked { color: var(--accent); }
+  .now-center { flex: 1; max-width: 700px; display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 0; }
+  .transport { display: flex; align-items: center; gap: 8px; }
+  .play-circle {
+    width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #000; border: none;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none;
+  }
+  .play-circle:hover { transform: scale(1.06); }
+  .scrub-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+  .scrub-time { font-size: 11px; color: var(--text-tertiary); width: 34px; flex: none; font-variant-numeric: tabular-nums; }
+  .scrub-time.end { text-align: right; }
+  .scrub { flex: 1; height: 4px; border-radius: 2px; background: var(--bg-active); position: relative; cursor: pointer; }
+  .scrub-fill { position: absolute; inset: 0; width: 53%; background: var(--text-primary); border-radius: 2px; }
+  .scrub:hover .scrub-fill { background: var(--accent); }
+  .scrub-handle {
+    position: absolute; top: 50%; left: 53%; width: 11px; height: 11px; border-radius: 50%;
+    background: #fff; transform: translate(-50%,-50%); opacity: 0; box-shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+  .scrub:hover .scrub-handle { opacity: 1; }
+  .now-right { display: flex; align-items: center; gap: 4px; width: 220px; flex: none; justify-content: flex-end; }
+  .volume-group { display: flex; align-items: center; gap: 7px; width: 108px; }
+  .volume-track { flex: 1; height: 4px; border-radius: 2px; background: var(--bg-active); position: relative; cursor: pointer; }
+  .volume-fill { position: absolute; inset: 0; width: 68%; background: var(--text-primary); border-radius: 2px; }
+  .volume-group:hover .volume-fill { background: var(--accent); }
   .jam-indicator {
     display: none; align-items: center; gap: 7px;
     background: var(--accent-wash); border: 1px solid rgba(30,215,96,.4);
     border-radius: 14px; padding: 5px 11px; font-size: 11.5px; font-weight: 700; color: var(--accent);
+    margin-right: 4px;
   }
   .jam-indicator.show { display: flex; }
   .jam-indicator .stack .avatar { width: 18px; height: 18px; font-size: 8px; border-width: 1.5px; }
+
+  /* ---------- Tooltips ---------- */
+  [data-tt] { position: relative; }
+  [data-tt]::after {
+    content: attr(data-tt);
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background: #000; color: #fff; font-size: 11px; font-weight: 700;
+    padding: 6px 10px; border-radius: 4px; white-space: nowrap;
+    opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .1s ease .35s;
+    box-shadow: 0 6px 16px rgba(0,0,0,.45); z-index: 50;
+  }
+  [data-tt]:hover::after { opacity: 1; visibility: visible; }
+  [data-tt].tt-right::after { left: auto; right: 0; transform: none; }
+  [data-tt].tt-below::after { bottom: auto; top: calc(100% + 8px); }
 
   /* ---------- Panel ---------- */
   .collab-panel {
@@ -391,6 +429,46 @@
   .composer.locked .composer-field { pointer-events: none; }
   .composer.locked .composer-input { color: var(--text-tertiary); }
   .composer.locked .send-btn { background: var(--bg-active); color: var(--text-tertiary); }
+
+  /* ---------- Pending track attachment ---------- */
+  .pending-attach {
+    display: none; align-items: center; gap: 9px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: 10px; padding: 7px; margin: 0 13px 9px; position: relative;
+  }
+  .pending-attach.show { display: flex; }
+  .pending-attach-art { width: 38px; height: 38px; border-radius: 4px; flex: none; }
+  .pending-attach-info { min-width: 0; flex: 1; }
+  .pending-attach-title { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pending-attach-artist { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pending-attach-remove {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--bg-panel);
+    background: #000; color: #fff; flex: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pending-attach-remove:hover { background: #222; }
+
+  /* ---------- Track picker sheet ---------- */
+  .track-picker-card { width: 372px; }
+  .picker-filters { display: flex; gap: 7px; padding: 4px 17px 10px; overflow-x: auto; flex: 0 0 auto; }
+  .picker-filters .filter-chip {
+    flex: none; border: none; font-family: var(--font-ui); cursor: pointer;
+    font-size: 12.5px; font-weight: 600; padding: 6px 13px; border-radius: 14px;
+    background: var(--bg-hover); color: var(--text-primary);
+  }
+  .picker-filters .filter-chip.active { background: var(--text-primary); color: #000; }
+  .track-row { display: flex; align-items: center; gap: 11px; padding: 7px 8px; border-radius: 8px; }
+  .track-row:hover { background: var(--bg-hover); }
+  .track-row-art { width: 42px; height: 42px; border-radius: 4px; flex: none; }
+  .track-row-info { flex: 1; min-width: 0; }
+  .track-row-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-row-sub { font-size: 11.5px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-add-btn {
+    flex: none; border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary);
+    font-size: 12px; font-weight: 700; padding: 6px 15px; border-radius: 14px; cursor: pointer; font-family: var(--font-ui);
+  }
+  .track-add-btn:hover { border-color: var(--text-primary); }
+  .track-add-btn.added { border-color: var(--accent); color: var(--accent); }
 
   /* ---------- New message / New group sheets ---------- */
   .sheet {
@@ -798,7 +876,7 @@
               <p class="collab-title">Collaborate</p>
               <p class="collab-sub">Messages, Jams, and friend activity</p>
             </div>
-            <button class="collab-close" id="collabClose" aria-label="Close panel">&#10005;</button>
+            <button class="collab-close tt-right" id="collabClose" data-tt="Close" aria-label="Close panel">&#10005;</button>
           </div>
           <div class="segmented" role="tablist">
             <button class="seg-btn active" data-pane="chats" role="tab" aria-selected="true">Messages <span class="seg-count">4</span></button>
@@ -835,7 +913,7 @@
                   <p class="jam-host-title" id="jamName">Start a Jam</p>
                   <p class="jam-host-sub" id="jamSubtitle">Listen in sync with friends, live</p>
                 </div>
-                <button class="gear-btn" id="jamSettingsBtn" title="Jam settings" aria-label="Jam settings">
+                <button class="gear-btn tt-right" id="jamSettingsBtn" data-tt="Jam settings" aria-label="Jam settings">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.5M12 18.5V21M21 12h-2.5M5.5 12H3M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8M18.4 18.4l-1.8-1.8M7.4 7.4L5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                 </button>
               </div>
@@ -935,8 +1013,8 @@
                 <div class="activity-meta"><span class="genre-pill">EDM</span><span>now</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn" title="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
-                <button class="mini-btn msg-jump" data-chat="adam" title="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+                <button class="mini-btn react-btn" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <button class="mini-btn msg-jump tt-right" data-chat="adam" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
 
@@ -948,8 +1026,8 @@
                 <div class="activity-meta"><span class="genre-pill">Pop</span><span>in a Jam &middot; 2 listening</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn" title="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
-                <button class="mini-btn msg-jump" data-chat="maya" title="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+                <button class="mini-btn react-btn" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <button class="mini-btn msg-jump tt-right" data-chat="maya" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
 
@@ -991,8 +1069,8 @@
                 <div class="activity-meta"><span class="genre-pill">Electronic</span><span>45m ago</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn" title="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
-                <button class="mini-btn msg-jump" data-chat="jordan" title="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+                <button class="mini-btn react-btn" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <button class="mini-btn msg-jump tt-right" data-chat="jordan" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
 
@@ -1004,8 +1082,8 @@
                 <div class="activity-meta"><span class="genre-pill">R&amp;B</span><span>1h ago</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn liked" title="React"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z"/></svg></button>
-                <button class="mini-btn msg-jump" data-chat="roadtrip" title="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+                <button class="mini-btn react-btn liked" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z"/></svg></button>
+                <button class="mini-btn msg-jump tt-right" data-chat="roadtrip" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
 
@@ -1052,22 +1130,30 @@
               <div class="convo-sub" id="convoSub"></div>
             </div>
             <div class="convo-actions">
-              <button class="mini-btn accent" id="convoJamBtn" title="Start a Jam with this chat">
+              <button class="mini-btn accent tt-right" id="convoJamBtn" data-tt="Start a Jam with this chat">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
               </button>
-              <button class="mini-btn" id="convoAddBtn" title="Add people">
+              <button class="mini-btn tt-right" id="convoAddBtn" data-tt="Add people">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.5-3 2.6-4.8 5.5-4.8s5 1.8 5.5 4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19 8v6M16 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </button>
             </div>
           </div>
           <div class="convo-scroll" id="convoScroll"></div>
+          <div class="pending-attach" id="pendingAttach">
+            <div class="pending-attach-art" id="pendingAttachArt"></div>
+            <div class="pending-attach-info">
+              <div class="pending-attach-title" id="pendingAttachTitle"></div>
+              <div class="pending-attach-artist" id="pendingAttachArtist"></div>
+            </div>
+            <button class="pending-attach-remove" id="pendingAttachRemove" aria-label="Remove track">&#10005;</button>
+          </div>
           <div class="composer" id="composer">
             <div class="composer-field">
               <input class="composer-input" id="composerInput" placeholder="Write a message..." aria-label="Message">
-              <button class="composer-icon" id="attachBtn" title="Share a track" aria-label="Share a track">
+              <button class="composer-icon" id="attachBtn" data-tt="Share a track" aria-label="Share a track">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 6v12M6 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </button>
-              <button class="composer-icon" id="stickerBtn" title="Sticker" aria-label="Sticker">
+              <button class="composer-icon" id="stickerBtn" data-tt="Sticker" aria-label="Sticker">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M13.5 3.2A9 9 0 1020.8 11c-4 .3-7.6-.6-7.3-7.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="10" r="1.2" fill="currentColor"/><circle cx="14" cy="15" r="1.2" fill="currentColor"/></svg>
               </button>
             </div>
@@ -1145,24 +1231,63 @@
 
     <!-- Now playing -->
     <div class="nowbar">
-      <div class="now-art"></div>
-      <div>
-        <div class="now-title">Late September</div>
-        <div class="now-artist">Cinnamon Chasers</div>
+      <div class="now-left">
+        <div class="now-art"></div>
+        <div class="now-meta">
+          <div class="now-title">Late September</div>
+          <div class="now-artist">Cinnamon Chasers</div>
+        </div>
+        <button class="np-icon-btn liked" data-tt="Remove from Liked Songs">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z"/></svg>
+        </button>
       </div>
       <div class="now-center">
         <div class="transport">
-          <span>&#8646;</span><span>&#9198;</span>
-          <span class="play-circle">&#9658;</span>
-          <span>&#9197;</span><span>&#8635;</span>
+          <button class="np-icon-btn" data-tt="Enable shuffle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M2 6h3.5l9 12H18M2 18h3.5l3-4M14 6h4M18 6V3l4 4-4 4V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="np-icon-btn" data-tt="Previous">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM19 5v14L9 12z"/></svg>
+          </button>
+          <button class="play-circle" id="npPlayBtn" data-tt="Pause">
+            <svg id="npPlayIcon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+          </button>
+          <button class="np-icon-btn" data-tt="Next">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 5h-2v14h2zM5 5v14l10-7z"/></svg>
+          </button>
+          <button class="np-icon-btn" data-tt="Enable repeat">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 3L3 6l3 3M3 6h13a4 4 0 014 4v1M18 21l3-3-3-3M21 18H8a4 4 0 01-4-4v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
-        <div class="scrub"></div>
+        <div class="scrub-row">
+          <span class="scrub-time">1:52</span>
+          <div class="scrub"><div class="scrub-fill"></div><div class="scrub-handle"></div></div>
+          <span class="scrub-time end">3:30</span>
+        </div>
       </div>
       <div class="now-right">
         <div class="jam-indicator" id="nowJam">
           <span class="live-dot"></span> In a Jam
           <div class="stack" id="nowJamStack"></div>
         </div>
+        <button class="np-icon-btn" data-tt="Now playing view">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="13" height="2" fill="currentColor"/><rect x="3" y="11" width="13" height="2" fill="currentColor"/><rect x="3" y="18" width="9" height="2" fill="currentColor"/><path d="M19 9l2 2-2 2M21 11h-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="np-icon-btn tt-right" data-tt="Connect to a device">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <div class="volume-group">
+          <button class="np-icon-btn" data-tt="Mute">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 010 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M19 6a9 9 0 010 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </button>
+          <div class="volume-track"><div class="volume-fill"></div></div>
+        </div>
+        <button class="np-icon-btn" data-tt="Mini player">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="11" y="12" width="7" height="5" rx="1" fill="currentColor"/></svg>
+        </button>
+        <button class="np-icon-btn tt-right" data-tt="Full screen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
     </div>
 
@@ -1296,6 +1421,48 @@
         <div class="upsell-foot">
           <button class="modal-start-btn">Try Premium free</button>
           <button class="text-btn" data-close="upsellModal">Not now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Jam confirm modal -->
+    <div class="modal-overlay" id="leaveJamModal">
+      <div class="modal-card upsell-card">
+        <div class="upsell-hero">
+          <div class="upsell-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <p class="upsell-title">You can only be in one Jam</p>
+          <p class="upsell-sub" id="leaveJamText">Leave your current Jam to join this one?</p>
+        </div>
+        <div class="upsell-foot">
+          <button class="modal-start-btn" id="confirmLeaveJamBtn">Leave &amp; join</button>
+          <button class="text-btn" data-close="leaveJamModal">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Share a track sheet -->
+    <div class="modal-overlay" id="trackPickerModal">
+      <div class="modal-card track-picker-card">
+        <div class="modal-header">
+          <p class="modal-title">Share a track</p>
+          <button class="modal-close" data-close="trackPickerModal" aria-label="Close">&#10005;</button>
+        </div>
+        <div class="picker-filters">
+          <button class="filter-chip active">Songs</button>
+          <button class="filter-chip">Playlists</button>
+          <button class="filter-chip">Albums</button>
+          <button class="filter-chip">Episodes</button>
+          <button class="filter-chip">Artists</button>
+        </div>
+        <div class="modal-scroll">
+          <div class="sheet-search" style="margin:2px 3px 8px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Search
+          </div>
+          <div class="modal-section-label" style="color:var(--text-primary);">Recently played</div>
+          <div id="trackPickerList"></div>
         </div>
       </div>
     </div>
@@ -1505,6 +1672,9 @@
     head.appendChild(cappedStack(c.people));
     document.getElementById('convoTitle').textContent = c.name;
     document.getElementById('convoSub').textContent = c.sub;
+    // Adding someone to a 1:1 turns it into a group, which only makes sense once a group already exists.
+    document.getElementById('convoAddBtn').style.display = c.type === 'group' ? '' : 'none';
+    clearPendingAttachment();
     convoScroll.innerHTML = '';
     if (c.messages.length) {
       convoScroll.appendChild(el('div', 'day-sep', 'Today'));
@@ -1532,10 +1702,19 @@
     convo.classList.remove('show');
   });
 
+  // What each friend is playing right now, so "Message" can hand it straight to the composer.
+  var CURRENT_TRACKS = {
+    adam: { title: 'Lifted – Mat Zo Remix', artist: 'Tritonal', art: 'linear-gradient(135deg,#2b3a6b,#4a5a9b)' },
+    maya: { title: 'Feather', artist: 'Sabrina Carpenter', art: 'linear-gradient(135deg,#7a2c4f,#c2497a)' },
+    jordan: { title: 'Cocoon', artist: 'Fred again..', art: 'linear-gradient(135deg,#3a5c47,#5f8f6f)' },
+    roadtrip: { title: 'Kill Bill', artist: 'SZA', art: 'linear-gradient(135deg,#5c3a6b,#8a5a9b)' }
+  };
   document.querySelectorAll('.msg-jump').forEach(function (btn) {
     btn.addEventListener('click', function () {
       selectPane('chats');
       openChat(btn.dataset.chat);
+      var track = CURRENT_TRACKS[btn.dataset.chat];
+      if (track) setPendingAttachment(track);
     });
   });
 
@@ -1556,30 +1735,86 @@
     }
   }
 
+  /* ---------- pending track attachment ---------- */
+  var pendingAttach = document.getElementById('pendingAttach');
+  var pendingAttachArt = document.getElementById('pendingAttachArt');
+  var pendingAttachTitle = document.getElementById('pendingAttachTitle');
+  var pendingAttachArtist = document.getElementById('pendingAttachArtist');
+  var pendingTrack = null;
+
+  function setPendingAttachment(track) {
+    pendingTrack = track;
+    pendingAttachArt.style.background = track.art;
+    pendingAttachTitle.textContent = track.title;
+    pendingAttachArtist.textContent = track.artist;
+    pendingAttach.classList.add('show');
+    composerInput.focus();
+  }
+  function clearPendingAttachment() {
+    pendingTrack = null;
+    pendingAttach.classList.remove('show');
+  }
+  document.getElementById('pendingAttachRemove').addEventListener('click', clearPendingAttachment);
+
+  function appendAndSend(m) {
+    var msgs = CHATS[activeChat].messages;
+    var prev = msgs[msgs.length - 1];
+    msgs.push(m);
+    convoScroll.appendChild(renderMessage(m, prev));
+    convoScroll.scrollTop = convoScroll.scrollHeight;
+    CHATS[activeChat].preview = m.track ? 'You: shared a track' : 'You: ' + m.text;
+    CHATS[activeChat].time = 'now';
+  }
+
   function sendMessage() {
     if (!isPremium) { openModal('upsellModal', 'chat'); return; }
     var text = composerInput.value.trim();
-    if (!text || !activeChat) return;
-    var msgs = CHATS[activeChat].messages;
-    var m = { from: 'me', text: text };
-    var prev = msgs[msgs.length - 1];
-    msgs.push(m);
-    convoScroll.appendChild(renderMessage(m, prev));
-    convoScroll.scrollTop = convoScroll.scrollHeight;
+    if (!activeChat || (!text && !pendingTrack)) return;
+    if (pendingTrack) appendAndSend({ from: 'me', track: pendingTrack });
+    if (text) appendAndSend({ from: 'me', text: text });
+    clearPendingAttachment();
+    renderChatList();
     composerInput.value = '';
   }
   document.getElementById('sendBtn').addEventListener('click', sendMessage);
-  document.getElementById('attachBtn').addEventListener('click', function () {
-    if (!isPremium || !activeChat) return;
-    var msgs = CHATS[activeChat].messages;
-    var m = { from: 'me', track: { title: 'Late September', artist: 'Cinnamon Chasers', art: 'linear-gradient(135deg,#4a3a2a,#8a6a3a)' } };
-    var prev = msgs[msgs.length - 1];
-    msgs.push(m);
-    convoScroll.appendChild(renderMessage(m, prev));
-    convoScroll.scrollTop = convoScroll.scrollHeight;
-  });
   composerInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') sendMessage(); });
   composer.addEventListener('click', function () { if (!isPremium) openModal('upsellModal', 'chat'); });
+
+  /* ---------- track picker sheet ---------- */
+  var TRACK_LIBRARY = [
+    { title: 'Late September', artist: 'Cinnamon Chasers', art: 'linear-gradient(135deg,#4a3a2a,#8a6a3a)' },
+    { title: 'Lifted – Mat Zo Remix', artist: 'Tritonal', art: 'linear-gradient(135deg,#2b3a6b,#4a5a9b)' },
+    { title: 'Feather', artist: 'Sabrina Carpenter', art: 'linear-gradient(135deg,#7a2c4f,#c2497a)' },
+    { title: 'Cocoon', artist: 'Fred again..', art: 'linear-gradient(135deg,#3a5c47,#5f8f6f)' },
+    { title: 'Texas Sun', artist: 'Khruangbin & Leon Bridges', art: 'linear-gradient(135deg,#8a5a2a,#c98a3e)' },
+    { title: 'Kill Bill', artist: 'SZA', art: 'linear-gradient(135deg,#5c3a6b,#8a5a9b)' }
+  ];
+  var trackPickerList = document.getElementById('trackPickerList');
+  function buildTrackPicker() {
+    trackPickerList.innerHTML = '';
+    TRACK_LIBRARY.forEach(function (t) {
+      var row = el('div', 'track-row');
+      var art = el('div', 'track-row-art');
+      art.style.background = t.art;
+      row.appendChild(art);
+      var info = el('div', 'track-row-info');
+      info.appendChild(el('div', 'track-row-title', t.title));
+      info.appendChild(el('div', 'track-row-sub', 'Song · ' + t.artist));
+      row.appendChild(info);
+      var addBtn = el('button', 'track-add-btn', 'Add');
+      addBtn.addEventListener('click', function () {
+        setPendingAttachment(t);
+        closeModal('trackPickerModal');
+      });
+      row.appendChild(addBtn);
+      trackPickerList.appendChild(row);
+    });
+  }
+  document.getElementById('attachBtn').addEventListener('click', function () {
+    if (!isPremium || !activeChat) return;
+    buildTrackPicker();
+    openModal('trackPickerModal');
+  });
 
   document.getElementById('convoJamBtn').addEventListener('click', function () {
     if (!isPremium) { openModal('upsellModal', 'jam'); return; }
@@ -1911,6 +2146,12 @@
   var jamFromChat = null;
 
   function startJam() {
+    // Hosting your own Jam means you can't also be a guest listening in someone else's.
+    if (currentJoinedBtn) {
+      currentJoinedBtn.classList.remove('joined');
+      currentJoinedBtn.textContent = currentJoinedBtn.dataset.default;
+      currentJoinedBtn = null;
+    }
     var picked = [], headcount = 0, notifyChats = [];
     document.querySelectorAll('.invite-row.checked').forEach(function (r) {
       picked.push(r.dataset.invite);
@@ -1980,12 +2221,63 @@
     queueBlock.appendChild(row);
   });
 
+  // Only one Jam can play at a time, so joining a second one has to confirm leaving the first.
+  var currentJoinedBtn = null;
+  var leaveJamTarget = null;
+  var leaveJamEndsHost = false;
+
+  function actuallyJoin(btn) {
+    if (currentJoinedBtn && currentJoinedBtn !== btn) {
+      currentJoinedBtn.classList.remove('joined');
+      currentJoinedBtn.textContent = currentJoinedBtn.dataset.default;
+    }
+    btn.classList.add('joined');
+    btn.textContent = 'Listening';
+    currentJoinedBtn = btn;
+  }
+
   document.querySelectorAll('.join-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (!isPremium) { openModal('upsellModal', 'jam'); return; }
-      var joined = btn.classList.toggle('joined');
-      btn.textContent = joined ? 'Listening' : btn.dataset.default;
+      if (btn.classList.contains('joined')) {
+        btn.classList.remove('joined');
+        btn.textContent = btn.dataset.default;
+        currentJoinedBtn = null;
+        return;
+      }
+      var targetName = btn.closest('.jam-card').querySelector('.jam-names').textContent;
+      if (jamLive) {
+        leaveJamTarget = btn; leaveJamEndsHost = true;
+        document.getElementById('leaveJamText').textContent = 'End your Jam to join ' + targetName + '?';
+        openModal('leaveJamModal');
+        return;
+      }
+      if (currentJoinedBtn && currentJoinedBtn !== btn) {
+        var currentName = currentJoinedBtn.closest('.jam-card').querySelector('.jam-names').textContent;
+        leaveJamTarget = btn; leaveJamEndsHost = false;
+        document.getElementById('leaveJamText').textContent = 'Leave ' + currentName + ' to join ' + targetName + '?';
+        openModal('leaveJamModal');
+        return;
+      }
+      actuallyJoin(btn);
     });
+  });
+
+  document.getElementById('confirmLeaveJamBtn').addEventListener('click', function () {
+    if (leaveJamEndsHost) endJam();
+    if (leaveJamTarget) actuallyJoin(leaveJamTarget);
+    leaveJamTarget = null;
+    closeModal('leaveJamModal');
+  });
+
+  var npPlayBtn = document.getElementById('npPlayBtn');
+  var npPlayIcon = document.getElementById('npPlayIcon');
+  var PAUSE_ICON = '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+  var PLAY_ICON = '<path d="M7 4l13 8-13 8z"/>';
+  npPlayBtn.addEventListener('click', function () {
+    var playing = npPlayBtn.dataset.tt === 'Pause';
+    npPlayBtn.dataset.tt = playing ? 'Play' : 'Pause';
+    npPlayIcon.innerHTML = playing ? PLAY_ICON : PAUSE_ICON;
   });
 
   document.querySelectorAll('.react-btn').forEach(function (btn) {
@@ -2015,6 +2307,7 @@
         b.textContent = b.dataset.default;
       }
     });
+    if (!isPremium) currentJoinedBtn = null;
     if (!isPremium && jamLive) endJam();
   }
   planToggle.addEventListener('click', function () { isPremium = !isPremium; applyPlan(); });
