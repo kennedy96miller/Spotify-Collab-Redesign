@@ -468,6 +468,23 @@
   .track-add-btn:hover { border-color: var(--text-primary); }
   .track-add-btn.added { border-color: var(--accent); color: var(--accent); }
   .picker-sub { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; margin: 0; padding: 2px 17px 12px; }
+  .modal-search {
+    display: flex; align-items: center; gap: 9px; flex: 0 0 auto;
+    height: 36px; border-radius: 6px; background: var(--bg-hover);
+    padding: 0 12px; margin: 10px 17px 4px; color: var(--text-tertiary);
+  }
+  .modal-search svg { flex: none; }
+  .modal-search input {
+    flex: 1; min-width: 0; background: transparent; border: none;
+    color: var(--text-primary); font-size: 13px; font-family: var(--font-ui);
+  }
+  .modal-search input::placeholder { color: var(--text-tertiary); }
+  .modal-search input:focus { outline: none; }
+  .invite-empty {
+    display: none; font-size: 12.5px; color: var(--text-tertiary);
+    text-align: center; padding: 22px 16px;
+  }
+  .invite-empty.show { display: block; }
 
   /* ---------- People list modal ---------- */
   .people-modal-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0; padding: 2px 17px 12px; }
@@ -1391,7 +1408,11 @@
           <p class="modal-title">Invite friends to your Jam</p>
           <button class="modal-close" data-close="inviteModal" aria-label="Close">&#10005;</button>
         </div>
-        <div class="modal-scroll">
+        <div class="modal-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="inviteSearch" placeholder="Search friends" aria-label="Search friends">
+        </div>
+        <div class="modal-scroll" id="inviteScroll">
           <div class="modal-section-label">Active Users</div>
           <div class="invite-row" data-invite="Adam" data-count="1" data-chat="adam">
             <div class="avatar" style="background:var(--c-adam);">AW</div>
@@ -1438,6 +1459,7 @@
             <div class="nearby-text">Auto-invite people nearby</div>
             <div class="qr-box"><div class="qr-grid" id="qrGrid"></div></div>
           </div>
+          <p class="invite-empty" id="inviteEmpty">No friends match that search.</p>
         </div>
         <div class="modal-footer">
           <div class="permission-row">
@@ -2046,7 +2068,7 @@
     jamFromChat = activeChat;
     convo.classList.remove('show');
     selectPane('jams');
-    openModal('inviteModal');
+    openInviteModal();
   });
   /* ---------- new message / new group sheets ---------- */
   var newMsgSheet = document.getElementById('newMsgSheet');
@@ -2391,6 +2413,31 @@
   var jamLive = false;
   var jamFromChat = null;
   var hostRoster = [];
+  var hostInviteLabels = [];
+
+  // Collect whoever is ticked in the invite modal into the roster, skipping anyone already in it.
+  function collectCheckedInvites() {
+    var notifyChats = [];
+    document.querySelectorAll('.invite-row.checked').forEach(function (r) {
+      if (hostInviteLabels.indexOf(r.dataset.invite) === -1) hostInviteLabels.push(r.dataset.invite);
+      if (r.dataset.chat) notifyChats.push(r.dataset.chat);
+      (INVITE_ROW_MEMBERS[r.dataset.invite] || []).forEach(function (id) {
+        var p = personById(id);
+        if (p && !hostRoster.some(function (h) { return h.id === id; })) hostRoster.push(p);
+      });
+    });
+    return notifyChats;
+  }
+
+  // A group counts as everyone in it, so the headcount can exceed the number of invites.
+  function renderJamInviteState() {
+    var headcount = hostRoster.length;
+    jamSubtitle.textContent = 'You’re hosting · ' + (headcount ? headcount + ' invited' : 'open to friends');
+    jamLiveText.textContent = hostInviteLabels.length
+      ? 'Live — invited ' + hostInviteLabels.join(', ') + (headcount > hostInviteLabels.length ? ' · ' + headcount + ' people' : '')
+      : 'Live — waiting for friends to join';
+    showJamStrip(jamNameEl.textContent, hostRoster.length ? hostRoster : [{ ini: 'KM', color: 'var(--c-you)' }]);
+  }
 
   function showJamStrip(name, people) {
     jamStripName.textContent = name;
@@ -2407,37 +2454,36 @@
       currentJoinedBtn.textContent = currentJoinedBtn.dataset.default;
       currentJoinedBtn = null;
     }
-    var picked = [], headcount = 0, notifyChats = [];
     hostRoster = [];
-    document.querySelectorAll('.invite-row.checked').forEach(function (r) {
-      picked.push(r.dataset.invite);
-      headcount += parseInt(r.dataset.count, 10) || 1;
-      if (r.dataset.chat) notifyChats.push(r.dataset.chat);
-      (INVITE_ROW_MEMBERS[r.dataset.invite] || []).forEach(function (id) {
-        var p = personById(id);
-        if (p && !hostRoster.some(function (h) { return h.id === id; })) hostRoster.push(p);
-      });
-    });
+    hostInviteLabels = [];
+    var notifyChats = collectCheckedInvites();
     jamLive = true;
     jamNameEl.textContent = document.getElementById('jamNameInput').value || "Kennedy's Jam";
-    jamSubtitle.textContent = 'You’re hosting · ' + (headcount ? headcount + ' invited' : 'open to friends');
     startBtn.textContent = 'End Jam';
     startBtn.classList.add('is-live');
     jamLiveRow.classList.add('show');
-    // A group counts as everyone in it, so the headcount can exceed the number of invites.
-    jamLiveText.textContent = picked.length
-      ? 'Live — invited ' + picked.join(', ') + (headcount > picked.length ? ' · ' + headcount + ' people' : '')
-      : 'Live — waiting for friends to join';
+    renderJamInviteState();
     if (jamFromChat && notifyChats.indexOf(jamFromChat) === -1) notifyChats.push(jamFromChat);
     notifyChats.forEach(function (key) { pushSystem(key, 'You started a Jam'); });
     jamFromChat = null;
     guestActions.classList.add('show');
     queueBlock.classList.add('show');
-    showJamStrip(jamNameEl.textContent, hostRoster.length ? hostRoster : [{ ini: 'KM', color: 'var(--c-you)' }]);
+    clearInviteSelection();
+    closeModal('inviteModal');
+  }
+
+  // Inviting more people into a Jam that is already live, rather than starting a new one.
+  function inviteToJam() {
+    var notifyChats = collectCheckedInvites();
+    renderJamInviteState();
+    notifyChats.forEach(function (key) { pushSystem(key, 'You invited them to your Jam'); });
+    clearInviteSelection();
     closeModal('inviteModal');
   }
   function endJam() {
     jamLive = false;
+    hostRoster = [];
+    hostInviteLabels = [];
     jamNameEl.textContent = 'Start a Jam';
     jamSubtitle.textContent = 'Listen in sync with friends, live';
     startBtn.textContent = 'Start listening together';
@@ -2446,7 +2492,55 @@
     guestActions.classList.remove('show');
     queueBlock.classList.remove('show');
     hideJamStrip();
+    clearInviteSelection();
+  }
+
+  /* ---------- invite modal: search + start/invite modes ---------- */
+  var inviteSearch = document.getElementById('inviteSearch');
+  var inviteScroll = document.getElementById('inviteScroll');
+  var inviteEmpty = document.getElementById('inviteEmpty');
+  var modalStartBtn = document.getElementById('modalStartBtn');
+
+  function clearInviteSelection() {
     document.querySelectorAll('.invite-row').forEach(function (r) { r.classList.remove('checked'); });
+    inviteSearch.value = '';
+    filterInviteRows();
+  }
+
+  // Hide rows that don't match, plus any section heading left with nothing under it.
+  function filterInviteRows() {
+    var q = inviteSearch.value.trim().toLowerCase();
+    var kids = Array.prototype.slice.call(inviteScroll.children);
+    var label = null, labelHits = 0, anyHit = 0;
+    function closeSection() { if (label) label.style.display = labelHits ? '' : 'none'; }
+
+    kids.forEach(function (node) {
+      if (node.classList.contains('modal-section-label')) {
+        closeSection();
+        label = node; labelHits = 0;
+        return;
+      }
+      if (node.classList.contains('invite-row')) {
+        var name = node.querySelector('.invite-name').textContent.toLowerCase();
+        var hit = !q || name.indexOf(q) !== -1;
+        node.style.display = hit ? '' : 'none';
+        if (hit) { labelHits++; anyHit++; }
+        return;
+      }
+      // Divider and the nearby/QR row are search-irrelevant, so hide them while filtering.
+      if (node.classList.contains('modal-divider') || node.classList.contains('nearby-row')) {
+        node.style.display = q ? 'none' : '';
+      }
+    });
+    closeSection();
+    inviteEmpty.classList.toggle('show', !!q && !anyHit);
+  }
+  inviteSearch.addEventListener('input', filterInviteRows);
+
+  function openInviteModal() {
+    modalStartBtn.textContent = jamLive ? 'Invite to Jam' : 'Start Jam';
+    clearInviteSelection();
+    openModal('inviteModal');
   }
 
   jamLiveRow.addEventListener('click', function () {
@@ -2458,7 +2552,7 @@
       people: people,
       foot: 'People in the Jam can see your username and profile picture.',
       inviteVisible: true,
-      onInvite: function () { openModal('inviteModal'); }
+      onInvite: function () { openInviteModal(); }
     });
   });
 
@@ -2470,19 +2564,21 @@
   startBtn.addEventListener('click', function () {
     if (!isPremium) { openModal('upsellModal', 'jam'); return; }
     if (jamLive) { openModal('endJamConfirmModal'); return; }
-    openModal('inviteModal');
+    openInviteModal();
   });
   document.getElementById('confirmEndJamBtn').addEventListener('click', function () {
     endJam();
     closeModal('endJamConfirmModal');
   });
-  document.getElementById('modalStartBtn').addEventListener('click', startJam);
+  modalStartBtn.addEventListener('click', function () {
+    if (jamLive) inviteToJam(); else startJam();
+  });
   document.getElementById('jamSettingsBtn').addEventListener('click', function () { openModal('settingsModal'); });
   document.getElementById('saveSettingsBtn').addEventListener('click', function () {
     if (jamLive) jamNameEl.textContent = document.getElementById('jamNameInput').value || "Kennedy's Jam";
     closeModal('settingsModal');
   });
-  document.getElementById('inviteMoreBtn').addEventListener('click', function () { openModal('inviteModal'); });
+  document.getElementById('inviteMoreBtn').addEventListener('click', openInviteModal);
   function appendQueueRow(track) {
     var row = el('div', 'queue-row');
     var art = el('div', 'queue-art');
