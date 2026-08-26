@@ -635,9 +635,16 @@
   .queue-info { flex: 1; min-width: 0; }
   .queue-title { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .queue-artist { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .queue-by { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 10.5px; color: var(--text-secondary); }
-  .queue-by .avatar { width: 15px; height: 15px; font-size: 7.5px; }
   .queue-row.playing .queue-title { color: var(--accent); }
+  .queue-right { display: flex; align-items: center; gap: 8px; flex: none; }
+  .queue-added-avatar { width: 30px; height: 30px; font-size: 11px; }
+  .drag-handle {
+    width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent;
+    color: var(--text-tertiary); display: flex; align-items: center; justify-content: center; cursor: grab;
+  }
+  .drag-handle:hover { background: var(--bg-active); color: var(--text-primary); }
+  .queue-row.dragging { opacity: .4; }
+  .queue-row[draggable="true"] { cursor: grab; }
   .eq-bars { display: flex; align-items: flex-end; gap: 2px; height: 12px; flex: none; }
   .eq-bars i { width: 2.5px; background: var(--accent); border-radius: 1px; animation: eq .9s ease-in-out infinite; }
   .eq-bars i:nth-child(1) { height: 60%; animation-delay: -.2s; }
@@ -993,16 +1000,23 @@
                 <div class="queue-info">
                   <div class="queue-title">Late September</div>
                   <div class="queue-artist">Cinnamon Chasers</div>
-                  <div class="queue-by"><span class="avatar" style="background:var(--c-you);">KM</span> Added by you</div>
                 </div>
-                <div class="eq-bars"><i></i><i></i><i></i></div>
+                <div class="queue-right">
+                  <div class="avatar queue-added-avatar" style="background:var(--c-you);" data-tt="Added by you">KM</div>
+                  <div class="eq-bars"><i></i><i></i><i></i></div>
+                </div>
               </div>
               <div class="queue-row">
                 <div class="queue-art" style="background:linear-gradient(135deg,#2b3a6b,#4a5a9b);"></div>
                 <div class="queue-info">
                   <div class="queue-title">Lifted &ndash; Mat Zo Remix</div>
                   <div class="queue-artist">Tritonal</div>
-                  <div class="queue-by"><span class="avatar" style="background:var(--c-adam);">AW</span> Added by Adam</div>
+                </div>
+                <div class="queue-right">
+                  <div class="avatar queue-added-avatar" style="background:var(--c-adam);" data-tt="Added by Adam">AW</div>
+                  <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
                 </div>
               </div>
               <div class="queue-row">
@@ -1010,7 +1024,12 @@
                 <div class="queue-info">
                   <div class="queue-title">Feather</div>
                   <div class="queue-artist">Sabrina Carpenter</div>
-                  <div class="queue-by"><span class="avatar" style="background:var(--c-maya);">MC</span> Added by Maya</div>
+                </div>
+                <div class="queue-right">
+                  <div class="avatar queue-added-avatar" style="background:var(--c-maya);" data-tt="Added by Maya">MC</div>
+                  <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
                 </div>
               </div>
               <div class="queue-row">
@@ -1018,7 +1037,12 @@
                 <div class="queue-info">
                   <div class="queue-title">Cocoon</div>
                   <div class="queue-artist">Fred again..</div>
-                  <div class="queue-by"><span class="avatar" style="background:var(--c-jordan);">JR</span> Added by Jordan</div>
+                </div>
+                <div class="queue-right">
+                  <div class="avatar queue-added-avatar" style="background:var(--c-jordan);" data-tt="Added by Jordan">JR</div>
+                  <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  </button>
                 </div>
               </div>
             </div>
@@ -2438,14 +2462,41 @@
     var info = el('div', 'queue-info');
     info.appendChild(el('div', 'queue-title', 'Kill Bill'));
     info.appendChild(el('div', 'queue-artist', 'SZA'));
-    var by = el('div', 'queue-by');
-    var a = el('span', 'avatar', 'KM');
-    a.style.background = 'var(--c-you)';
-    by.appendChild(a);
-    by.appendChild(document.createTextNode(' Added by you'));
-    info.appendChild(by);
     row.appendChild(info);
+    var right = el('div', 'queue-right');
+    var a = el('div', 'avatar queue-added-avatar', 'KM');
+    a.style.background = 'var(--c-you)';
+    a.dataset.tt = 'Added by you';
+    right.appendChild(a);
+    var handle = el('button', 'drag-handle', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>');
+    handle.dataset.tt = 'Drag to reorder';
+    handle.setAttribute('aria-label', 'Drag to reorder');
+    right.appendChild(handle);
+    row.appendChild(right);
     queueBlock.appendChild(row);
+    makeQueueRowDraggable(row);
+  });
+
+  /* ---------- drag-to-reorder the queue ---------- */
+  function makeQueueRowDraggable(row) {
+    if (row.classList.contains('playing')) return;
+    row.draggable = true;
+    row.addEventListener('dragstart', function () { row.classList.add('dragging'); });
+    row.addEventListener('dragend', function () { row.classList.remove('dragging'); });
+  }
+  document.querySelectorAll('#queueBlock .queue-row').forEach(makeQueueRowDraggable);
+
+  queueBlock.addEventListener('dragover', function (e) {
+    var dragging = queueBlock.querySelector('.queue-row.dragging');
+    if (!dragging) return;
+    e.preventDefault();
+    var rows = Array.prototype.slice.call(queueBlock.querySelectorAll('.queue-row:not(.dragging):not(.playing)'));
+    var after = rows.find(function (r) {
+      var rect = r.getBoundingClientRect();
+      return e.clientY <= rect.top + rect.height / 2;
+    });
+    if (after) queueBlock.insertBefore(dragging, after);
+    else queueBlock.appendChild(dragging);
   });
 
   // Only one Jam can play at a time, so joining a second one has to confirm leaving the first.
