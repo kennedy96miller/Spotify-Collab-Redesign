@@ -663,6 +663,11 @@
   .drag-handle:hover { background: var(--bg-active); color: var(--text-primary); }
   .queue-row.dragging { opacity: .4; }
   .queue-row[draggable="true"] { cursor: grab; }
+  .guest-queue-note {
+    display: flex; align-items: center; gap: 6px; margin: -2px 7px 8px;
+    font-size: 11px; color: var(--text-tertiary);
+  }
+  .guest-queue-note svg { flex: none; }
   .eq-bars { display: flex; align-items: flex-end; gap: 2px; height: 12px; flex: none; }
   .eq-bars i { width: 2.5px; background: var(--accent); border-radius: 1px; animation: eq .9s ease-in-out infinite; }
   .eq-bars i:nth-child(1) { height: 60%; animation-delay: -.2s; }
@@ -1099,6 +1104,15 @@
             </div>
 
             <p class="empty-hint" id="jamsHint">Anyone in a Jam can add to the queue &mdash; every track shows who picked it.</p>
+
+            <div class="queue-block" id="guestQueueBlock">
+              <div class="section-label" id="guestQueueLabel">In the queue</div>
+              <p class="guest-queue-note" id="guestQueueNote">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" stroke="currentColor" stroke-width="2"/></svg>
+                <span id="guestQueueNoteText">Only the host can change this queue</span>
+              </p>
+              <div id="guestQueueList"></div>
+            </div>
           </div>
 
           <!-- ===== Friends ===== -->
@@ -1762,12 +1776,23 @@
     friday: {
       title: 'Friday Kitchen Session',
       host: { name: 'Nina Patel', ini: 'NP', color: 'var(--c-nina)' },
-      guests: [{ name: 'Jordan Ruiz', ini: 'JR', color: 'var(--c-jordan)' }]
+      guests: [{ name: 'Jordan Ruiz', ini: 'JR', color: 'var(--c-jordan)' }],
+      queue: [
+        { title: 'Texas Sun', artist: 'Khruangbin & Leon Bridges', art: 'linear-gradient(135deg,#8a5a2a,#c98a3e)', by: ['NP', 'var(--c-nina)', 'Nina'] },
+        { title: 'Bad Habit', artist: 'Steve Lacy', art: 'linear-gradient(135deg,#3a5c47,#6a9b7a)', by: ['JR', 'var(--c-jordan)', 'Jordan'] },
+        { title: 'Sunset Lover', artist: 'Petit Biscuit', art: 'linear-gradient(135deg,#5c3a6b,#9b6ab8)', by: ['NP', 'var(--c-nina)', 'Nina'] },
+        { title: 'Sativa', artist: 'Jhené Aiko', art: 'linear-gradient(135deg,#6b2a4a,#b8557f)', by: ['JR', 'var(--c-jordan)', 'Jordan'] }
+      ]
     },
     maya: {
       title: "Maya's Jam",
       host: { name: 'Maya Chen', ini: 'MC', color: 'var(--c-maya)' },
-      guests: []
+      guests: [],
+      queue: [
+        { title: 'Padam Padam', artist: 'Kylie Minogue', art: 'linear-gradient(135deg,#7a2c4f,#c2497a)', by: ['MC', 'var(--c-maya)', 'Maya'] },
+        { title: 'Feather', artist: 'Sabrina Carpenter', art: 'linear-gradient(135deg,#8a3a5c,#d06a94)', by: ['MC', 'var(--c-maya)', 'Maya'] },
+        { title: 'Espresso', artist: 'Sabrina Carpenter', art: 'linear-gradient(135deg,#6b4a2a,#c9903e)', by: ['MC', 'var(--c-maya)', 'Maya'] }
+      ]
     }
   };
 
@@ -2453,6 +2478,7 @@
       currentJoinedBtn.classList.remove('joined');
       currentJoinedBtn.textContent = currentJoinedBtn.dataset.default;
       currentJoinedBtn = null;
+      hideGuestQueue();
     }
     hostRoster = [];
     hostInviteLabels = [];
@@ -2507,11 +2533,12 @@
     filterInviteRows();
   }
 
-  // Hide rows that don't match, plus any section heading left with nothing under it.
+  // Hide rows that don't match the search, anyone already in the Jam, and any heading left empty.
   function filterInviteRows() {
     var q = inviteSearch.value.trim().toLowerCase();
+    var inJam = hostRoster.map(function (p) { return p.id; });
     var kids = Array.prototype.slice.call(inviteScroll.children);
-    var label = null, labelHits = 0, anyHit = 0;
+    var label = null, labelHits = 0, anyHit = 0, hiddenAsJoined = 0;
     function closeSection() { if (label) label.style.display = labelHits ? '' : 'none'; }
 
     kids.forEach(function (node) {
@@ -2521,8 +2548,12 @@
         return;
       }
       if (node.classList.contains('invite-row')) {
+        var members = INVITE_ROW_MEMBERS[node.dataset.invite] || [];
+        // A group stays offered until every one of its members is already in.
+        var allJoined = members.length > 0 && members.every(function (id) { return inJam.indexOf(id) !== -1; });
+        if (allJoined) hiddenAsJoined++;
         var name = node.querySelector('.invite-name').textContent.toLowerCase();
-        var hit = !q || name.indexOf(q) !== -1;
+        var hit = !allJoined && (!q || name.indexOf(q) !== -1);
         node.style.display = hit ? '' : 'none';
         if (hit) { labelHits++; anyHit++; }
         return;
@@ -2533,7 +2564,16 @@
       }
     });
     closeSection();
-    inviteEmpty.classList.toggle('show', !!q && !anyHit);
+
+    if (!anyHit && !q && hiddenAsJoined) {
+      inviteEmpty.textContent = 'Everyone you can invite is already in the Jam.';
+      inviteEmpty.classList.add('show');
+    } else if (!anyHit && q) {
+      inviteEmpty.textContent = 'No friends match that search.';
+      inviteEmpty.classList.add('show');
+    } else {
+      inviteEmpty.classList.remove('show');
+    }
   }
   inviteSearch.addEventListener('input', filterInviteRows);
 
@@ -2669,6 +2709,42 @@
   var leaveJamTarget = null;
   var leaveJamEndsHost = false;
 
+  /* ---------- the queue of a Jam you joined as a guest: visible but not yours to edit ---------- */
+  var guestQueueBlock = document.getElementById('guestQueueBlock');
+  var guestQueueList = document.getElementById('guestQueueList');
+
+  function showGuestQueue(jamKey) {
+    var jam = JAMS_ROSTER[jamKey];
+    if (!jam) { hideGuestQueue(); return; }
+    document.getElementById('guestQueueLabel').textContent = 'In the queue · ' + jam.title;
+    document.getElementById('guestQueueNoteText').textContent =
+      'Only ' + jam.host.name.split(' ')[0] + ' can change this queue';
+    guestQueueList.innerHTML = '';
+    jam.queue.forEach(function (t, i) {
+      var row = el('div', 'queue-row' + (i === 0 ? ' playing' : ''));
+      var art = el('div', 'queue-art');
+      art.style.background = t.art;
+      row.appendChild(art);
+      var info = el('div', 'queue-info');
+      info.appendChild(el('div', 'queue-title', t.title));
+      info.appendChild(el('div', 'queue-artist', t.artist));
+      row.appendChild(info);
+      var right = el('div', 'queue-right');
+      var a = el('div', 'avatar queue-added-avatar', t.by[0]);
+      a.style.background = t.by[1];
+      a.dataset.tt = 'Added by ' + t.by[2];
+      right.appendChild(a);
+      // Trailing slot stays in place but empty — no drag handle, since this queue is read-only.
+      var trailing = el('div', 'queue-trailing');
+      if (i === 0) trailing.appendChild(el('div', 'eq-bars', '<i></i><i></i><i></i>'));
+      right.appendChild(trailing);
+      row.appendChild(right);
+      guestQueueList.appendChild(row);
+    });
+    guestQueueBlock.classList.add('show');
+  }
+  function hideGuestQueue() { guestQueueBlock.classList.remove('show'); }
+
   function actuallyJoin(btn) {
     if (currentJoinedBtn && currentJoinedBtn !== btn) {
       currentJoinedBtn.classList.remove('joined');
@@ -2677,9 +2753,11 @@
     btn.classList.add('joined');
     btn.textContent = 'Listening';
     currentJoinedBtn = btn;
-    var roster = JAMS_ROSTER[btn.closest('.jam-card').dataset.jam];
-    var jamName = btn.closest('.jam-card').querySelector('.jam-names').textContent;
+    var card = btn.closest('.jam-card');
+    var roster = JAMS_ROSTER[card.dataset.jam];
+    var jamName = card.querySelector('.jam-names').textContent;
     showJamStrip(jamName, roster ? [roster.host].concat(roster.guests) : []);
+    showGuestQueue(card.dataset.jam);
   }
 
   var pendingLeaveBtn = null;
@@ -2719,6 +2797,7 @@
       currentJoinedBtn = null;
       pendingLeaveBtn = null;
       hideJamStrip();
+      hideGuestQueue();
     }
     closeModal('leaveGuestJamModal');
   });
@@ -2767,7 +2846,7 @@
         b.textContent = b.dataset.default;
       }
     });
-    if (!isPremium) { currentJoinedBtn = null; hideJamStrip(); }
+    if (!isPremium) { currentJoinedBtn = null; hideJamStrip(); hideGuestQueue(); }
     if (!isPremium && jamLive) endJam();
   }
   planToggle.addEventListener('click', function () { isPremium = !isPremium; applyPlan(); });
