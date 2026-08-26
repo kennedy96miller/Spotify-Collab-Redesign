@@ -467,6 +467,7 @@
   }
   .track-add-btn:hover { border-color: var(--text-primary); }
   .track-add-btn.added { border-color: var(--accent); color: var(--accent); }
+  .picker-sub { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; margin: 0; padding: 2px 17px 12px; }
 
   /* ---------- People list modal ---------- */
   .people-modal-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0; padding: 2px 17px 12px; }
@@ -627,17 +628,19 @@
 
   .queue-block { display: none; margin-top: 4px; }
   .queue-block.show { display: block; }
-  .queue-row { display: flex; align-items: center; gap: 10px; padding: 7px; border-radius: 8px; }
+  .queue-row { display: flex; align-items: center; gap: 11px; padding: 8px 7px; border-radius: 8px; }
   .queue-row:hover { background: var(--bg-elevated); }
-  .queue-art { width: 36px; height: 36px; border-radius: 4px; flex: none; }
+  .queue-art { width: 38px; height: 38px; border-radius: 4px; flex: none; }
   .queue-info { flex: 1; min-width: 0; }
   .queue-title { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .queue-artist { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .queue-row.playing .queue-title { color: var(--accent); }
-  .queue-right { display: flex; align-items: center; gap: 8px; flex: none; }
-  .queue-added-avatar { width: 30px; height: 30px; font-size: 11px; }
+  /* Fixed-width slots keep the avatars in one column and the eq/handle in another. */
+  .queue-right { display: flex; align-items: center; gap: 10px; flex: none; }
+  .queue-added-avatar { width: 22px; height: 22px; font-size: 8.5px; }
+  .queue-trailing { width: 26px; height: 26px; flex: none; display: flex; align-items: center; justify-content: center; }
   .drag-handle {
-    width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent;
+    width: 26px; height: 26px; border-radius: 6px; border: none; background: transparent;
     color: var(--text-tertiary); display: flex; align-items: center; justify-content: center; cursor: grab;
   }
   .drag-handle:hover { background: var(--bg-active); color: var(--text-primary); }
@@ -1001,7 +1004,7 @@
                 </div>
                 <div class="queue-right">
                   <div class="avatar queue-added-avatar" style="background:var(--c-you);" data-tt="Added by you">KM</div>
-                  <div class="eq-bars"><i></i><i></i><i></i></div>
+                  <div class="queue-trailing"><div class="eq-bars"><i></i><i></i><i></i></div></div>
                 </div>
               </div>
               <div class="queue-row">
@@ -1012,9 +1015,11 @@
                 </div>
                 <div class="queue-right">
                   <div class="avatar queue-added-avatar" style="background:var(--c-adam);" data-tt="Added by Adam">AW</div>
-                  <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  </button>
+                  <div class="queue-trailing">
+                    <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="queue-row">
@@ -1025,9 +1030,11 @@
                 </div>
                 <div class="queue-right">
                   <div class="avatar queue-added-avatar" style="background:var(--c-maya);" data-tt="Added by Maya">MC</div>
-                  <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  </button>
+                  <div class="queue-trailing">
+                    <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="queue-row">
@@ -1038,9 +1045,11 @@
                 </div>
                 <div class="queue-right">
                   <div class="avatar queue-added-avatar" style="background:var(--c-jordan);" data-tt="Added by Jordan">JR</div>
-                  <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  </button>
+                  <div class="queue-trailing">
+                    <button class="drag-handle" data-tt="Drag to reorder" aria-label="Drag to reorder">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1590,6 +1599,32 @@
           </div>
           <div class="modal-section-label" style="color:var(--text-primary);">Recently played</div>
           <div id="trackPickerList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add to Jam queue sheet -->
+    <div class="modal-overlay" id="addQueueModal">
+      <div class="modal-card track-picker-card">
+        <div class="modal-header">
+          <p class="modal-title">Add to queue</p>
+          <button class="modal-close" data-close="addQueueModal" aria-label="Close">&#10005;</button>
+        </div>
+        <p class="picker-sub" id="addQueueSub">Picked to match the Jam &mdash; mellow electronic and indie.</p>
+        <div class="picker-filters">
+          <button class="filter-chip active">Suggested</button>
+          <button class="filter-chip">Songs</button>
+          <button class="filter-chip">Playlists</button>
+          <button class="filter-chip">Albums</button>
+          <button class="filter-chip">Artists</button>
+        </div>
+        <div class="modal-scroll">
+          <div class="sheet-search" style="margin:2px 3px 8px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Search
+          </div>
+          <div class="modal-section-label" style="color:var(--text-primary);">Suggested for this Jam</div>
+          <div id="addQueueList"></div>
         </div>
       </div>
     </div>
@@ -2448,28 +2483,67 @@
     closeModal('settingsModal');
   });
   document.getElementById('inviteMoreBtn').addEventListener('click', function () { openModal('inviteModal'); });
-  document.getElementById('addToQueueBtn').addEventListener('click', function () {
-    if (!isPremium) { openModal('upsellModal', 'jam'); return; }
+  function appendQueueRow(track) {
     var row = el('div', 'queue-row');
     var art = el('div', 'queue-art');
-    art.style.background = 'linear-gradient(135deg,#5c3a6b,#8a5a9b)';
+    art.style.background = track.art;
     row.appendChild(art);
     var info = el('div', 'queue-info');
-    info.appendChild(el('div', 'queue-title', 'Kill Bill'));
-    info.appendChild(el('div', 'queue-artist', 'SZA'));
+    info.appendChild(el('div', 'queue-title', track.title));
+    info.appendChild(el('div', 'queue-artist', track.artist));
     row.appendChild(info);
     var right = el('div', 'queue-right');
     var a = el('div', 'avatar queue-added-avatar', 'KM');
     a.style.background = 'var(--c-you)';
     a.dataset.tt = 'Added by you';
     right.appendChild(a);
+    var trailing = el('div', 'queue-trailing');
     var handle = el('button', 'drag-handle', '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>');
     handle.dataset.tt = 'Drag to reorder';
     handle.setAttribute('aria-label', 'Drag to reorder');
-    right.appendChild(handle);
+    trailing.appendChild(handle);
+    right.appendChild(trailing);
     row.appendChild(right);
     queueBlock.appendChild(row);
     makeQueueRowDraggable(row);
+  }
+
+  /* ---------- add to queue: suggestions matched to what's already queued ---------- */
+  var QUEUE_SUGGESTIONS = [
+    { title: 'Delilah (pull me out of this)', artist: 'Fred again..', art: 'linear-gradient(135deg,#2f5c4a,#6aa88a)' },
+    { title: 'Midnight City', artist: 'M83', art: 'linear-gradient(135deg,#2a2f6b,#5a63b8)' },
+    { title: 'Sun Models', artist: 'ODESZA', art: 'linear-gradient(135deg,#6b4a2a,#c9903e)' },
+    { title: 'Alright', artist: 'Jungle', art: 'linear-gradient(135deg,#7a3a5c,#c26a94)' },
+    { title: 'Kill Bill', artist: 'SZA', art: 'linear-gradient(135deg,#5c3a6b,#8a5a9b)' },
+    { title: 'Innerbloom', artist: 'RÜFÜS DU SOL', art: 'linear-gradient(135deg,#2a4a6b,#4f88b8)' }
+  ];
+  var addQueueList = document.getElementById('addQueueList');
+  function buildAddQueueList() {
+    addQueueList.innerHTML = '';
+    QUEUE_SUGGESTIONS.forEach(function (t) {
+      var row = el('div', 'track-row');
+      var art = el('div', 'track-row-art');
+      art.style.background = t.art;
+      row.appendChild(art);
+      var info = el('div', 'track-row-info');
+      info.appendChild(el('div', 'track-row-title', t.title));
+      info.appendChild(el('div', 'track-row-sub', 'Song · ' + t.artist));
+      row.appendChild(info);
+      var addBtn = el('button', 'track-add-btn', 'Add');
+      addBtn.addEventListener('click', function () {
+        if (addBtn.classList.contains('added')) return;
+        appendQueueRow(t);
+        addBtn.classList.add('added');
+        addBtn.textContent = 'Added';
+      });
+      row.appendChild(addBtn);
+      addQueueList.appendChild(row);
+    });
+  }
+  document.getElementById('addToQueueBtn').addEventListener('click', function () {
+    if (!isPremium) { openModal('upsellModal', 'jam'); return; }
+    buildAddQueueList();
+    openModal('addQueueModal');
   });
 
   /* ---------- drag-to-reorder the queue ---------- */
