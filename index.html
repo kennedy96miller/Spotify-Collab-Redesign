@@ -670,6 +670,72 @@
     font-size: 11px; color: var(--text-tertiary);
   }
   .guest-queue-note svg { flex: none; }
+
+  /* Queue / Recently played tabs */
+  .queue-tabs { display: flex; gap: 14px; margin: 12px 7px 2px; border-bottom: 1px solid var(--border); }
+  .queue-tab {
+    border: none; background: transparent; color: var(--text-tertiary);
+    font-size: 12.5px; font-weight: 700; font-family: var(--font-ui); cursor: pointer;
+    padding: 4px 1px 8px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .queue-tab:hover { color: var(--text-primary); }
+  .queue-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+  .queue-sub-head { display: flex; align-items: baseline; justify-content: space-between; padding-right: 7px; }
+  .clear-queue-btn {
+    border: none; background: transparent; color: var(--text-tertiary);
+    font-size: 11.5px; font-weight: 700; font-family: var(--font-ui); cursor: pointer; padding: 2px;
+  }
+  .clear-queue-btn:hover { color: var(--text-primary); }
+
+  /* Hover ⋯ on the now-playing row */
+  .np-more {
+    width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent;
+    color: var(--text-secondary); flex: none; cursor: pointer; font-size: 15px; letter-spacing: 1px;
+    display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .12s;
+  }
+  .queue-row:hover .np-more { opacity: 1; }
+  .np-more:hover { color: var(--text-primary); background: var(--bg-active); }
+
+  /* Pending suggestion rows (guest suggesting into a host-only queue) */
+  .queue-row.pending { opacity: .62; }
+  .pending-pill {
+    font-size: 9.5px; font-weight: 700; color: var(--text-secondary);
+    background: rgba(255,255,255,.09); border-radius: 9px; padding: 2px 7px; flex: none;
+  }
+
+  /* Jams-to-join header with the Start a Jam pill */
+  .jams-join-head { display: flex; align-items: center; justify-content: space-between; padding-right: 7px; }
+  .jams-join-head .section-label { flex: 1; }
+  .jams-join-head .join-btn { display: inline-flex; align-items: center; gap: 6px; }
+  .jams-join-head .join-btn[hidden] { display: none; }
+
+  /* Track context menu */
+  .ctx-menu {
+    position: absolute; z-index: 70; width: 218px;
+    background: #282828; border-radius: 5px; padding: 4px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.55);
+    max-height: 420px; overflow-y: auto;
+  }
+  .ctx-item {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    border: none; background: transparent; color: var(--text-primary);
+    font-size: 12.5px; font-family: var(--font-ui); text-align: left;
+    padding: 9px 10px; border-radius: 3px; cursor: pointer;
+  }
+  .ctx-item:hover { background: rgba(255,255,255,.1); }
+  .ctx-sub { color: var(--text-secondary); font-size: 13px; }
+  .ctx-divider { height: 1px; background: rgba(255,255,255,.1); margin: 4px 0; }
+
+  /* Read-only Jam settings (viewing the host's configuration) */
+  .settings-readonly-note {
+    display: none; font-size: 11.5px; color: var(--text-tertiary);
+    padding: 0 17px 4px; margin: 0;
+  }
+  .modal-card.readonly .settings-readonly-note { display: block; }
+  .modal-card.readonly .name-input,
+  .modal-card.readonly .opt-group,
+  .modal-card.readonly .toggle-switch { pointer-events: none; opacity: .55; }
+  .modal-card.readonly .modal-footer { display: none; }
   .eq-bars { display: flex; align-items: flex-end; gap: 2px; height: 12px; flex: none; }
   .eq-bars i { width: 2.5px; background: var(--accent); border-radius: 1px; animation: eq .9s ease-in-out infinite; }
   .eq-bars i:nth-child(1) { height: 60%; animation-delay: -.2s; }
@@ -999,7 +1065,7 @@
           <div class="pane" id="pane-jams">
             <div class="jam-host-card">
               <div class="jam-host-top">
-                <div class="avatar" style="background:var(--c-you);">KM</div>
+                <div class="avatar" id="jamHostAvatar" style="background:var(--c-you);">KM</div>
                 <div>
                   <p class="jam-host-title" id="jamName">Start a Jam</p>
                   <p class="jam-host-sub" id="jamSubtitle">Listen in sync with friends, live</p>
@@ -1026,7 +1092,12 @@
             </div>
 
             <div class="queue-block" id="queueBlock">
-              <div class="section-label">In the queue</div>
+              <div class="queue-tabs">
+                <button class="queue-tab active" data-qpane="queue">Queue</button>
+                <button class="queue-tab" data-qpane="recent">Recently played</button>
+              </div>
+              <div class="queue-pane" data-qpane-body="queue">
+              <div class="section-label">Now playing</div>
               <div class="queue-row playing">
                 <div class="queue-art" style="background:linear-gradient(135deg,#4a3a2a,#8a6a3a);"></div>
                 <div class="queue-info">
@@ -1034,10 +1105,16 @@
                   <div class="queue-artist">Cinnamon Chasers</div>
                 </div>
                 <div class="queue-right">
+                  <button class="np-more" data-tt="More options" aria-label="More options">&#8943;</button>
                   <div class="avatar queue-added-avatar" style="background:var(--c-you);" data-tt="Added by you">KM</div>
                   <div class="queue-trailing"><div class="eq-bars"><i></i><i></i><i></i></div></div>
                 </div>
               </div>
+              <div class="queue-sub-head">
+                <span class="section-label">Next in queue</span>
+                <button class="clear-queue-btn" id="clearQueueBtn">Clear queue</button>
+              </div>
+              <div id="queueList">
               <div class="queue-row">
                 <div class="queue-art" style="background:linear-gradient(135deg,#2b3a6b,#4a5a9b);"></div>
                 <div class="queue-info">
@@ -1083,9 +1160,35 @@
                   </div>
                 </div>
               </div>
+              </div>
+              </div>
+              <div class="queue-pane" data-qpane-body="recent" hidden>
+                <div class="section-label">Recently played</div>
+                <div id="queueRecentList"></div>
+              </div>
             </div>
 
-            <div class="section-label">Jams to join</div>
+            <div class="queue-block" id="guestQueueBlock">
+              <div class="queue-tabs">
+                <button class="queue-tab active" data-qpane="queue">Queue</button>
+                <button class="queue-tab" data-qpane="recent">Recently played</button>
+              </div>
+              <div class="queue-pane" data-qpane-body="queue">
+                <div id="guestQueueList"></div>
+              </div>
+              <div class="queue-pane" data-qpane-body="recent" hidden>
+                <div class="section-label">Recently played</div>
+                <div id="guestRecentList"></div>
+              </div>
+            </div>
+
+            <div class="jams-join-head">
+              <span class="section-label">Jams to join</span>
+              <button class="join-btn" id="startJamPill" hidden>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="2"/></svg>
+                Start a Jam
+              </button>
+            </div>
 
             <div class="jam-card" data-jam="friday">
               <div class="stack">
@@ -1113,15 +1216,6 @@
             </div>
 
             <p class="empty-hint" id="jamsHint">Anyone in a Jam can add to the queue &mdash; every track shows who picked it.</p>
-
-            <div class="queue-block" id="guestQueueBlock">
-              <div class="section-label" id="guestQueueLabel">In the queue</div>
-              <p class="guest-queue-note" id="guestQueueNote">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" stroke="currentColor" stroke-width="2"/></svg>
-                <span id="guestQueueNoteText">Only the host can change this queue</span>
-              </p>
-              <div id="guestQueueList"></div>
-            </div>
           </div>
 
           <!-- ===== Friends ===== -->
@@ -1417,6 +1511,24 @@
       </div>
     </div>
 
+    <!-- Track context menu -->
+    <div class="ctx-menu" id="ctxMenu" hidden>
+      <button class="ctx-item">Add to playlist <span class="ctx-sub">&#8250;</span></button>
+      <button class="ctx-item">Remove from this playlist</button>
+      <button class="ctx-item">Save to your Liked Songs</button>
+      <button class="ctx-item">Add to queue</button>
+      <button class="ctx-item">Exclude from your taste profile</button>
+      <button class="ctx-item">Start a Jam</button>
+      <button class="ctx-item">Sleep timer <span class="ctx-sub">&#8250;</span></button>
+      <div class="ctx-divider"></div>
+      <button class="ctx-item">Go to song radio</button>
+      <button class="ctx-item">Go to artist <span class="ctx-sub">&#8250;</span></button>
+      <button class="ctx-item">Go to album</button>
+      <button class="ctx-item">View credits</button>
+      <div class="ctx-divider"></div>
+      <button class="ctx-item">Share <span class="ctx-sub">&#8250;</span></button>
+    </div>
+
     <!-- Jam strip -->
     <button class="jam-strip" id="jamStrip">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="2"/></svg>
@@ -1496,11 +1608,12 @@
 
     <!-- Jam settings modal -->
     <div class="modal-overlay" id="settingsModal">
-      <div class="modal-card">
+      <div class="modal-card" id="settingsCard">
         <div class="modal-header">
           <p class="modal-title">Jam settings</p>
           <button class="modal-close" data-close="settingsModal" aria-label="Close">&#10005;</button>
         </div>
+        <p class="settings-readonly-note" id="settingsReadonlyNote">Set by the host &mdash; only they can change these.</p>
         <div class="modal-scroll">
           <div class="field">
             <div class="field-label">Jam name</div>
@@ -1655,7 +1768,7 @@
     <div class="modal-overlay" id="addQueueModal">
       <div class="modal-card track-picker-card">
         <div class="modal-header">
-          <p class="modal-title">Add to queue</p>
+          <p class="modal-title" id="addQueueTitle">Add to queue</p>
           <button class="modal-close" data-close="addQueueModal" aria-label="Close">&#10005;</button>
         </div>
         <p class="picker-sub" id="addQueueSub">Picked to match the Jam &mdash; mellow electronic and indie.</p>
@@ -1790,6 +1903,11 @@
       note: 'hosted by Nina',
       host: { name: 'Nina Patel', ini: 'NP', color: 'var(--c-nina)' },
       guests: [{ name: 'Jordan Ruiz', ini: 'JR', color: 'var(--c-jordan)' }],
+      settings: { join: 'Invited only', queue: 'Host only', feeds: true, guestInvite: true },
+      recent: [
+        { title: 'Glue', artist: 'Bicep', art: 'linear-gradient(135deg,#2a3a5c,#4a6a9b)' },
+        { title: 'So We Won’t Forget', artist: 'Khruangbin', art: 'linear-gradient(135deg,#6b4a2a,#a8783e)' }
+      ],
       queue: [
         { title: 'Texas Sun', artist: 'Khruangbin & Leon Bridges', art: 'linear-gradient(135deg,#8a5a2a,#c98a3e)', by: ['NP', 'var(--c-nina)', 'Nina'] },
         { title: 'Bad Habit', artist: 'Steve Lacy', art: 'linear-gradient(135deg,#3a5c47,#6a9b7a)', by: ['JR', 'var(--c-jordan)', 'Jordan'] },
@@ -1802,6 +1920,10 @@
       note: 'open to anyone',
       host: { name: 'Maya Chen', ini: 'MC', color: 'var(--c-maya)' },
       guests: [{ name: 'Theo Brandt', ini: 'TB', color: 'var(--c-theo)' }],
+      settings: { join: 'Anyone with the link', queue: 'Everyone', feeds: true, guestInvite: true },
+      recent: [
+        { title: 'Houdini', artist: 'Dua Lipa', art: 'linear-gradient(135deg,#5c2a4a,#a8447f)' }
+      ],
       queue: [
         { title: 'Padam Padam', artist: 'Kylie Minogue', art: 'linear-gradient(135deg,#7a2c4f,#c2497a)', by: ['MC', 'var(--c-maya)', 'Maya'] },
         { title: 'Feather', artist: 'Sabrina Carpenter', art: 'linear-gradient(135deg,#8a3a5c,#d06a94)', by: ['MC', 'var(--c-maya)', 'Maya'] },
@@ -1863,6 +1985,8 @@
     var card = document.querySelector('.jam-card[data-jam="' + key + '"]');
     var jam = JAMS_ROSTER[key];
     if (!card || !jam) return;
+    // The jam you're listening in lives in the green card above, not in this list.
+    card.style.display = isJoinedJam(key) ? 'none' : '';
     var people = [jam.host].concat(jam.guests);
     if (isJoinedJam(key)) people.push({ name: 'You', ini: 'KM', color: 'var(--c-you)' });
     var stack = card.querySelector('.stack');
@@ -1920,6 +2044,7 @@
       jam.guests.splice(Math.floor(Math.random() * jam.guests.length), 1);
     }
     renderJamCard(key);
+    if (guestJamKey === key) renderGuestHostCard();
   }
   setInterval(driftJamListeners, 5000);
 
@@ -2524,6 +2649,7 @@
   var jamLiveText = document.getElementById('jamLiveText');
   var guestActions = document.getElementById('jamGuestActions');
   var queueBlock = document.getElementById('queueBlock');
+  var queueList = document.getElementById('queueList');
   var jamStrip = document.getElementById('jamStrip');
   var jamStripName = document.getElementById('jamStripName');
   var jamStripStack = document.getElementById('jamStripStack');
@@ -2565,18 +2691,11 @@
   function hideJamStrip() { jamStrip.classList.remove('show'); }
 
   // Hosting your own Jam means you can't also be a guest listening in someone else's.
-  function dropGuestJam() {
-    if (!currentJoinedBtn) return;
-    currentJoinedBtn.classList.remove('joined');
-    currentJoinedBtn.textContent = currentJoinedBtn.dataset.default;
-    currentJoinedBtn = null;
-    hideGuestQueue();
-    document.querySelectorAll('.jam-card').forEach(function (c) { renderJamCard(c.dataset.jam); });
-  }
+  function dropGuestJam() { exitGuestJamView(); }
 
   function activateJam() {
     jamLive = true;
-    jamNameEl.textContent = document.getElementById('jamNameInput').value || "Kennedy's Jam";
+    jamNameEl.textContent = ownJamName || "Kennedy's Jam";
     startBtn.textContent = 'End Jam';
     startBtn.classList.add('is-live');
     jamLiveRow.classList.add('show');
@@ -2696,6 +2815,7 @@
   }
 
   jamLiveRow.addEventListener('click', function () {
+    if (guestJamKey) { openJamPeopleModal(guestJamKey); return; }
     var people = [{ name: 'You', ini: 'KM', color: 'var(--c-you)', role: 'Host' }]
       .concat(hostRoster.map(function (p) { return { name: p.name, ini: p.ini, color: p.color, role: 'Listening' }; }));
     openPeopleModal({
@@ -2710,12 +2830,17 @@
 
   jamStrip.addEventListener('click', function () {
     if (jamLive) { jamLiveRow.click(); return; }
-    if (currentJoinedBtn) currentJoinedBtn.closest('.jam-card').click();
+    if (guestJamKey) openJamPeopleModal(guestJamKey);
   });
 
   startBtn.addEventListener('click', function () {
     if (!isPremium) { openModal('upsellModal', 'jam'); return; }
     if (jamLive) { openModal('endJamConfirmModal'); return; }
+    if (guestJamKey) {
+      document.getElementById('leaveGuestJamTitle').textContent = 'Leave ' + JAMS_ROSTER[guestJamKey].title + '?';
+      openModal('leaveGuestJamModal');
+      return;
+    }
     openInviteModal();
   });
   document.getElementById('confirmEndJamBtn').addEventListener('click', function () {
@@ -2725,9 +2850,51 @@
   modalStartBtn.addEventListener('click', function () {
     if (jamLive) inviteToJam(); else startJam();
   });
-  document.getElementById('jamSettingsBtn').addEventListener('click', function () { openModal('settingsModal'); });
+  var settingsCard = document.getElementById('settingsCard');
+  var jamNameInput = document.getElementById('jamNameInput');
+
+  function applySettingsToModal(name, cfg) {
+    jamNameInput.value = name;
+    document.querySelectorAll('.opt-group').forEach(function (g) {
+      var want = cfg[g.dataset.setting];
+      g.querySelectorAll('.opt-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.value === want);
+      });
+    });
+    document.getElementById('publicToggle').classList.toggle('on', !!cfg.feeds);
+    document.getElementById('guestInviteToggle').classList.toggle('on', !!cfg.guestInvite);
+  }
+  function readSettingsFromModal() {
+    var cfg = {};
+    document.querySelectorAll('.opt-group').forEach(function (g) {
+      var active = g.querySelector('.opt-btn.active');
+      cfg[g.dataset.setting] = active ? active.dataset.value : '';
+    });
+    cfg.feeds = document.getElementById('publicToggle').classList.contains('on');
+    cfg.guestInvite = document.getElementById('guestInviteToggle').classList.contains('on');
+    return cfg;
+  }
+  // Your own Jam's configuration, kept across guest views overwriting the modal.
+  var ownSettings = readSettingsFromModal();
+  var ownJamName = jamNameInput.value;
+
+  document.getElementById('jamSettingsBtn').addEventListener('click', function () {
+    if (guestJamKey) {
+      var jam = JAMS_ROSTER[guestJamKey];
+      applySettingsToModal(jam.title, jam.settings);
+      document.getElementById('settingsReadonlyNote').textContent =
+        'Set by ' + jam.host.name.split(' ')[0] + ' — only they can change these.';
+      settingsCard.classList.add('readonly');
+    } else {
+      applySettingsToModal(ownJamName, ownSettings);
+      settingsCard.classList.remove('readonly');
+    }
+    openModal('settingsModal');
+  });
   document.getElementById('saveSettingsBtn').addEventListener('click', function () {
-    if (jamLive) jamNameEl.textContent = document.getElementById('jamNameInput').value || "Kennedy's Jam";
+    ownSettings = readSettingsFromModal();
+    ownJamName = jamNameInput.value || "Kennedy's Jam";
+    if (jamLive) jamNameEl.textContent = ownJamName;
     closeModal('settingsModal');
   });
   document.getElementById('inviteMoreBtn').addEventListener('click', openInviteModal);
@@ -2752,8 +2919,33 @@
     trailing.appendChild(handle);
     right.appendChild(trailing);
     row.appendChild(right);
-    queueBlock.appendChild(row);
+    queueList.appendChild(row);
     makeQueueRowDraggable(row);
+  }
+
+  // A row in the queue of a Jam someone else hosts: added directly, or pending the host's OK.
+  function appendGuestQueueRow(track, pendingApproval) {
+    var jam = JAMS_ROSTER[guestJamKey];
+    var row = el('div', 'queue-row' + (pendingApproval ? ' pending' : ''));
+    var art = el('div', 'queue-art');
+    art.style.background = track.art;
+    row.appendChild(art);
+    var info = el('div', 'queue-info');
+    info.appendChild(el('div', 'queue-title', track.title));
+    info.appendChild(el('div', 'queue-artist', track.artist));
+    row.appendChild(info);
+    var right = el('div', 'queue-right');
+    var a = el('div', 'avatar queue-added-avatar', 'KM');
+    a.style.background = 'var(--c-you)';
+    a.dataset.tt = pendingApproval
+      ? 'Suggested by you — waiting for ' + jam.host.name.split(' ')[0]
+      : 'Added by you';
+    right.appendChild(a);
+    var trailing = el('div', 'queue-trailing');
+    if (pendingApproval) trailing.appendChild(el('span', 'pending-pill', 'Pending'));
+    right.appendChild(trailing);
+    row.appendChild(right);
+    guestQueueList.appendChild(row);
   }
 
   /* ---------- add to queue: suggestions matched to what's already queued ---------- */
@@ -2766,7 +2958,9 @@
     { title: 'Innerbloom', artist: 'RÜFÜS DU SOL', art: 'linear-gradient(135deg,#2a4a6b,#4f88b8)' }
   ];
   var addQueueList = document.getElementById('addQueueList');
-  function buildAddQueueList() {
+  function buildAddQueueList(mode) {
+    var verb = mode === 'suggest' ? 'Suggest' : 'Add';
+    var done = mode === 'suggest' ? 'Suggested' : 'Added';
     addQueueList.innerHTML = '';
     QUEUE_SUGGESTIONS.forEach(function (t) {
       var row = el('div', 'track-row');
@@ -2777,12 +2971,13 @@
       info.appendChild(el('div', 'track-row-title', t.title));
       info.appendChild(el('div', 'track-row-sub', 'Song · ' + t.artist));
       row.appendChild(info);
-      var addBtn = el('button', 'track-add-btn', 'Add');
+      var addBtn = el('button', 'track-add-btn', verb);
       addBtn.addEventListener('click', function () {
         if (addBtn.classList.contains('added')) return;
-        appendQueueRow(t);
+        if (mode === 'own') appendQueueRow(t);
+        else appendGuestQueueRow(t, mode === 'suggest');
         addBtn.classList.add('added');
-        addBtn.textContent = 'Added';
+        addBtn.textContent = done;
       });
       row.appendChild(addBtn);
       addQueueList.appendChild(row);
@@ -2790,7 +2985,21 @@
   }
   document.getElementById('addToQueueBtn').addEventListener('click', function () {
     if (!isPremium) { openModal('upsellModal', 'jam'); return; }
-    buildAddQueueList();
+    var mode = 'own', title = 'Add to queue',
+        sub = 'Picked to match the Jam — mellow electronic and indie.';
+    if (guestJamKey) {
+      var jam = JAMS_ROSTER[guestJamKey];
+      if (jam.settings.queue === 'Host only') {
+        mode = 'suggest';
+        title = 'Suggest a song';
+        sub = jam.host.name.split(' ')[0] + ' approves suggestions before they join the queue.';
+      } else {
+        mode = 'guest-add';
+      }
+    }
+    document.getElementById('addQueueTitle').textContent = title;
+    document.getElementById('addQueueSub').textContent = sub;
+    buildAddQueueList(mode);
     openModal('addQueueModal');
   });
 
@@ -2801,19 +3010,73 @@
     row.addEventListener('dragstart', function () { row.classList.add('dragging'); });
     row.addEventListener('dragend', function () { row.classList.remove('dragging'); });
   }
-  document.querySelectorAll('#queueBlock .queue-row').forEach(makeQueueRowDraggable);
+  document.querySelectorAll('#queueList .queue-row').forEach(makeQueueRowDraggable);
 
-  queueBlock.addEventListener('dragover', function (e) {
-    var dragging = queueBlock.querySelector('.queue-row.dragging');
+  queueList.addEventListener('dragover', function (e) {
+    var dragging = queueList.querySelector('.queue-row.dragging');
     if (!dragging) return;
     e.preventDefault();
-    var rows = Array.prototype.slice.call(queueBlock.querySelectorAll('.queue-row:not(.dragging):not(.playing)'));
+    var rows = Array.prototype.slice.call(queueList.querySelectorAll('.queue-row:not(.dragging)'));
     var after = rows.find(function (r) {
       var rect = r.getBoundingClientRect();
       return e.clientY <= rect.top + rect.height / 2;
     });
-    if (after) queueBlock.insertBefore(dragging, after);
-    else queueBlock.appendChild(dragging);
+    if (after) queueList.insertBefore(dragging, after);
+    else queueList.appendChild(dragging);
+  });
+
+  document.getElementById('clearQueueBtn').addEventListener('click', function () {
+    queueList.innerHTML = '';
+  });
+
+  /* ---------- Queue / Recently played tabs ---------- */
+  document.querySelectorAll('.queue-block').forEach(function (block) {
+    block.querySelectorAll('.queue-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        block.querySelectorAll('.queue-tab').forEach(function (t2) { t2.classList.toggle('active', t2 === tab); });
+        block.querySelectorAll('.queue-pane').forEach(function (p) { p.hidden = p.dataset.qpaneBody !== tab.dataset.qpane; });
+      });
+    });
+  });
+
+  function renderRecentList(listEl, items) {
+    listEl.innerHTML = '';
+    items.forEach(function (t) {
+      var row = el('div', 'queue-row');
+      var art = el('div', 'queue-art');
+      art.style.background = t.art;
+      row.appendChild(art);
+      var info = el('div', 'queue-info');
+      info.appendChild(el('div', 'queue-title', t.title));
+      info.appendChild(el('div', 'queue-artist', t.artist));
+      row.appendChild(info);
+      listEl.appendChild(row);
+    });
+  }
+  var OWN_RECENT = [
+    { title: 'Yali', artist: 'Mahmut Orhan, Neje Karabö&#231;ek', art: 'linear-gradient(135deg,#4a2a5c,#7a4a9b)' },
+    { title: 'Transatlantic', artist: 'Mahmut Orhan, ZHU', art: 'linear-gradient(135deg,#2a4a3a,#4a8a6a)' },
+    { title: 'Three', artist: 'Mahmut Orhan, Felix Raphael', art: 'linear-gradient(135deg,#5c4a2a,#a8843e)' }
+  ];
+  renderRecentList(document.getElementById('queueRecentList'), OWN_RECENT);
+
+  /* ---------- track context menu (the three dots on a now-playing row) ---------- */
+  var ctxMenu = document.getElementById('ctxMenu');
+  var appEl = document.querySelector('.app');
+  function openCtxMenu(btn) {
+    ctxMenu.hidden = false;
+    var ar = appEl.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    var left = Math.max(8, Math.min(br.right - ar.left - 218, ar.width - 226));
+    var top = br.bottom - ar.top + 6;
+    if (top + ctxMenu.offsetHeight > ar.height - 8) top = br.top - ar.top - ctxMenu.offsetHeight - 6;
+    top = Math.max(8, Math.min(top, ar.height - ctxMenu.offsetHeight - 8));
+    ctxMenu.style.left = left + 'px';
+    ctxMenu.style.top = top + 'px';
+  }
+  document.addEventListener('click', function (e) {
+    var moreBtn = e.target.closest('.np-more');
+    if (moreBtn) { openCtxMenu(moreBtn); return; }
+    ctxMenu.hidden = true;
   });
 
   // Only one Jam can play at a time, so joining a second one has to confirm leaving the first.
@@ -2824,13 +3087,13 @@
   /* ---------- the queue of a Jam you joined as a guest: visible but not yours to edit ---------- */
   var guestQueueBlock = document.getElementById('guestQueueBlock');
   var guestQueueList = document.getElementById('guestQueueList');
+  var guestJamKey = null;
 
   function showGuestQueue(jamKey) {
     var jam = JAMS_ROSTER[jamKey];
     if (!jam) { hideGuestQueue(); return; }
-    document.getElementById('guestQueueLabel').textContent = 'In the queue · ' + jam.title;
-    document.getElementById('guestQueueNoteText').textContent =
-      'Only ' + jam.host.name.split(' ')[0] + ' can change this queue';
+    var hostOnly = jam.settings.queue === 'Host only';
+    var LOCK_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" stroke="currentColor" stroke-width="2"/></svg>';
     guestQueueList.innerHTML = '';
     jam.queue.forEach(function (t, i) {
       var row = el('div', 'queue-row' + (i === 0 ? ' playing' : ''));
@@ -2842,42 +3105,106 @@
       info.appendChild(el('div', 'queue-artist', t.artist));
       row.appendChild(info);
       var right = el('div', 'queue-right');
+      if (i === 0) right.appendChild(el('button', 'np-more', '&#8943;'));
       var a = el('div', 'avatar queue-added-avatar', t.by[0]);
       a.style.background = t.by[1];
       a.dataset.tt = 'Added by ' + t.by[2];
       right.appendChild(a);
-      // Trailing slot stays in place but empty — no drag handle, since this queue is read-only.
+      // Trailing slot stays in place but carries no drag handle — reordering belongs to the host.
       var trailing = el('div', 'queue-trailing');
       if (i === 0) trailing.appendChild(el('div', 'eq-bars', '<i></i><i></i><i></i>'));
       right.appendChild(trailing);
       row.appendChild(right);
-      guestQueueList.appendChild(row);
+      if (i === 0) {
+        guestQueueList.appendChild(el('div', 'section-label', 'Now playing'));
+        guestQueueList.appendChild(row);
+        guestQueueList.appendChild(el('div', 'section-label', 'Next in queue'));
+        if (hostOnly) {
+          guestQueueList.appendChild(el('p', 'guest-queue-note',
+            LOCK_SVG + '<span>Only ' + jam.host.name.split(' ')[0] + ' can change this queue</span>'));
+        }
+      } else {
+        guestQueueList.appendChild(row);
+      }
     });
+    renderRecentList(document.getElementById('guestRecentList'), jam.recent);
     guestQueueBlock.classList.add('show');
   }
   function hideGuestQueue() { guestQueueBlock.classList.remove('show'); }
 
-  function actuallyJoin(btn) {
-    if (currentJoinedBtn && currentJoinedBtn !== btn) {
+  /* ---------- the host card doubles as the view of a Jam you joined ---------- */
+  var jamHostAvatar = document.getElementById('jamHostAvatar');
+  var addToQueueBtnEl = document.getElementById('addToQueueBtn');
+  var startJamPill = document.getElementById('startJamPill');
+  var ADD_QUEUE_LABEL = addToQueueBtnEl.innerHTML;
+
+  function renderGuestHostCard() {
+    var jam = JAMS_ROSTER[guestJamKey];
+    if (!jam) return;
+    var count = 1 + jam.guests.length + 1; // host + guests + you
+    jamHostAvatar.textContent = jam.host.ini;
+    jamHostAvatar.style.background = jam.host.color;
+    jamNameEl.textContent = jam.title;
+    jamSubtitle.textContent = jam.host.name.split(' ')[0] + ' is hosting · ' + count + ' listening';
+    jamLiveText.textContent = 'Live — ' + count + ' listening · ' + jam.note;
+    showJamStrip(jam.title, [jam.host].concat(jam.guests).concat([{ ini: 'KM', color: 'var(--c-you)' }]));
+  }
+
+  function enterGuestJamView(key) {
+    guestJamKey = key;
+    var jam = JAMS_ROSTER[key];
+    startBtn.textContent = 'Leave Jam';
+    startBtn.classList.add('is-live');
+    jamLiveRow.classList.add('show');
+    guestActions.classList.add('show');
+    addToQueueBtnEl.innerHTML = jam.settings.queue === 'Host only'
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 6h11M4 12h11M4 18h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 9v8M14 13h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Suggest a song'
+      : ADD_QUEUE_LABEL;
+    startJamPill.hidden = false;
+    renderGuestHostCard();
+    showGuestQueue(key);
+  }
+
+  function exitGuestJamView() {
+    if (!guestJamKey) return;
+    guestJamKey = null;
+    jamHostAvatar.textContent = 'KM';
+    jamHostAvatar.style.background = 'var(--c-you)';
+    jamNameEl.textContent = 'Start a Jam';
+    jamSubtitle.textContent = 'Listen in sync with friends, live';
+    startBtn.textContent = 'Start listening together';
+    startBtn.classList.remove('is-live');
+    jamLiveRow.classList.remove('show');
+    guestActions.classList.remove('show');
+    addToQueueBtnEl.innerHTML = ADD_QUEUE_LABEL;
+    startJamPill.hidden = true;
+    hideGuestQueue();
+    hideJamStrip();
+    if (currentJoinedBtn) {
       currentJoinedBtn.classList.remove('joined');
       currentJoinedBtn.textContent = currentJoinedBtn.dataset.default;
+      currentJoinedBtn = null;
     }
+    document.querySelectorAll('.jam-card').forEach(function (c) { renderJamCard(c.dataset.jam); });
+  }
+
+  startJamPill.addEventListener('click', function () {
+    if (!isPremium) { openModal('upsellModal', 'jam'); return; }
+    openInviteModal();
+  });
+
+  function actuallyJoin(btn) {
+    exitGuestJamView();
     btn.classList.add('joined');
     btn.textContent = 'Listening';
     currentJoinedBtn = btn;
-    var card = btn.closest('.jam-card');
-    var roster = JAMS_ROSTER[card.dataset.jam];
-    var jamName = card.querySelector('.jam-names').textContent;
-    var stripPeople = roster ? [roster.host].concat(roster.guests) : [];
-    stripPeople.push({ name: 'You', ini: 'KM', color: 'var(--c-you)' });
-    showJamStrip(jamName, stripPeople);
-    showGuestQueue(card.dataset.jam);
+    enterGuestJamView(btn.closest('.jam-card').dataset.jam);
     document.querySelectorAll('.jam-card').forEach(function (c) { renderJamCard(c.dataset.jam); });
   }
 
   var pendingLeaveBtn = null;
 
-  document.querySelectorAll('.join-btn').forEach(function (btn) {
+  document.querySelectorAll('.jam-card .join-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (!isPremium) { openModal('upsellModal', 'jam'); return; }
       if (btn.classList.contains('joined')) {
@@ -2906,15 +3233,8 @@
   });
 
   document.getElementById('confirmLeaveGuestBtn').addEventListener('click', function () {
-    if (pendingLeaveBtn) {
-      pendingLeaveBtn.classList.remove('joined');
-      pendingLeaveBtn.textContent = pendingLeaveBtn.dataset.default;
-      currentJoinedBtn = null;
-      pendingLeaveBtn = null;
-      hideJamStrip();
-      hideGuestQueue();
-      document.querySelectorAll('.jam-card').forEach(function (c) { renderJamCard(c.dataset.jam); });
-    }
+    pendingLeaveBtn = null;
+    exitGuestJamView();
     closeModal('leaveGuestJamModal');
   });
 
@@ -2952,7 +3272,7 @@
     document.getElementById('jamsHint').textContent = isPremium
       ? 'Anyone in a Jam can add to the queue — every track shows who picked it.'
       : 'Free accounts can see who’s listening. Joining a Jam needs Premium.';
-    document.querySelectorAll('.join-btn').forEach(function (b) {
+    document.querySelectorAll('.jam-card .join-btn').forEach(function (b) {
       b.innerHTML = '';
       if (!isPremium) {
         b.appendChild(el('span', 'lock-pill', '<svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2.4"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5" stroke="currentColor" stroke-width="2.4"/></svg>'));
