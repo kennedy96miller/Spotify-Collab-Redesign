@@ -25,6 +25,10 @@
     --c-priya: #f472b6;
     --c-theo: #5aa9ff;
     --c-nina: #f2b84b;
+    --c-sam: #2f9e6c;
+    --c-lena: #a855c9;
+    --c-marcus: #5b7c99;
+    --c-ava: #d16b54;
     --c-you: #1ed760;
 
     --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -105,7 +109,7 @@
   .icon-btn:active { transform: scale(.94); }
   .icon-btn.is-active { color: #04220f; background: var(--accent); }
   .unread-badge {
-    position: absolute; top: 1px; right: 0;
+    position: absolute; top: -3px; left: -6px;
     min-width: 16px; height: 16px; border-radius: 8px;
     background: var(--accent); color: #04220f;
     font-size: 10px; font-weight: 800; line-height: 16px; text-align: center;
@@ -484,6 +488,13 @@
   }
   .modal-search input::placeholder { color: var(--text-tertiary); }
   .modal-search input:focus { outline: none; }
+  .modal-search-clear {
+    display: none; align-items: center; justify-content: center; flex: none;
+    width: 20px; height: 20px; border-radius: 50%; border: none;
+    background: var(--bg-active); color: var(--text-secondary); cursor: pointer; font-size: 11px;
+  }
+  .modal-search-clear.show { display: flex; }
+  .modal-search-clear:hover { color: var(--text-primary); }
   .invite-empty {
     display: none; font-size: 12.5px; color: var(--text-tertiary);
     text-align: center; padding: 22px 16px;
@@ -1577,6 +1588,7 @@
         <div class="modal-search">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <input id="inviteSearch" placeholder="Search friends" aria-label="Search friends">
+          <button class="modal-search-clear" id="inviteSearchClear" aria-label="Clear search">&#10005;</button>
         </div>
         <div class="modal-scroll" id="inviteScroll">
           <div class="modal-section-label">Active Friends</div>
@@ -1605,6 +1617,62 @@
             </div>
             <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           </div>
+          <div class="invite-row" data-invite="Priya" data-count="1">
+            <div class="avatar" style="background:var(--c-priya);">PN</div>
+            <div class="invite-info">
+              <div class="invite-name">Priya Nair</div>
+              <div class="invite-sub">You listened together last week</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Theo" data-count="1">
+            <div class="avatar" style="background:var(--c-theo);">TB</div>
+            <div class="invite-info">
+              <div class="invite-name">Theo Brandt</div>
+              <div class="invite-sub">You listened together last week</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Nina" data-count="1">
+            <div class="avatar" style="background:var(--c-nina);">NP</div>
+            <div class="invite-info">
+              <div class="invite-name">Nina Patel</div>
+              <div class="invite-sub">You listened together last week</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Sam" data-count="1">
+            <div class="avatar" style="background:var(--c-sam);">SO</div>
+            <div class="invite-info">
+              <div class="invite-name">Sam Okafor</div>
+              <div class="invite-sub">You've shared content with each other</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Lena" data-count="1">
+            <div class="avatar" style="background:var(--c-lena);">LC</div>
+            <div class="invite-info">
+              <div class="invite-name">Lena Choi</div>
+              <div class="invite-sub">You've shared content with each other</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Marcus" data-count="1">
+            <div class="avatar" style="background:var(--c-marcus);">MW</div>
+            <div class="invite-info">
+              <div class="invite-name">Marcus Webb</div>
+              <div class="invite-sub">You listened together last week</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Ava" data-count="1">
+            <div class="avatar" style="background:var(--c-ava);">AT</div>
+            <div class="invite-info">
+              <div class="invite-name">Ava Torres</div>
+              <div class="invite-sub">You've shared content with each other</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
           <div class="invite-row" data-invite="Road Trip Crew" data-count="3" data-chat="roadtrip">
             <div class="stack">
               <div class="avatar" style="background:var(--c-priya);">PN</div>
@@ -1613,6 +1681,54 @@
             </div>
             <div class="invite-info">
               <div class="invite-name">Road Trip Crew</div>
+              <div class="invite-sub">Group &middot; 3 people</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Wedding Party Mix" data-count="3" data-chat="wedding">
+            <div class="stack">
+              <div class="avatar" style="background:var(--c-jordan);">JR</div>
+              <div class="avatar" style="background:var(--c-nina);">NP</div>
+              <div class="avatar" style="background:var(--c-theo);">TB</div>
+            </div>
+            <div class="invite-info">
+              <div class="invite-name">Wedding Party Mix</div>
+              <div class="invite-sub">Group &middot; 3 people</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Mystery Podcast Crew" data-count="3">
+            <div class="stack">
+              <div class="avatar" style="background:var(--c-sam);">SO</div>
+              <div class="avatar" style="background:var(--c-lena);">LC</div>
+              <div class="avatar" style="background:var(--c-jordan);">JR</div>
+            </div>
+            <div class="invite-info">
+              <div class="invite-name">Mystery Podcast Crew</div>
+              <div class="invite-sub">Group &middot; 3 people</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="3am Club Crawlers" data-count="3">
+            <div class="stack">
+              <div class="avatar" style="background:var(--c-marcus);">MW</div>
+              <div class="avatar" style="background:var(--c-ava);">AT</div>
+              <div class="avatar" style="background:var(--c-adam);">AW</div>
+            </div>
+            <div class="invite-info">
+              <div class="invite-name">3am Club Crawlers</div>
+              <div class="invite-sub">Group &middot; 3 people</div>
+            </div>
+            <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="invite-row" data-invite="Work Besties" data-count="3">
+            <div class="stack">
+              <div class="avatar" style="background:var(--c-priya);">PN</div>
+              <div class="avatar" style="background:var(--c-sam);">SO</div>
+              <div class="avatar" style="background:var(--c-maya);">MC</div>
+            </div>
+            <div class="invite-info">
+              <div class="invite-name">Work Besties</div>
               <div class="invite-sub">Group &middot; 3 people</div>
             </div>
             <div class="check-toggle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1916,7 +2032,11 @@
     { id: 'jordan', name: 'Jordan Ruiz',   ini: 'JR', color: 'var(--c-jordan)', chat: 'jordan' },
     { id: 'priya',  name: 'Priya Nair',    ini: 'PN', color: 'var(--c-priya)' },
     { id: 'theo',   name: 'Theo Brandt',   ini: 'TB', color: 'var(--c-theo)' },
-    { id: 'nina',   name: 'Nina Patel',    ini: 'NP', color: 'var(--c-nina)' }
+    { id: 'nina',   name: 'Nina Patel',    ini: 'NP', color: 'var(--c-nina)' },
+    { id: 'sam',    name: 'Sam Okafor',    ini: 'SO', color: 'var(--c-sam)' },
+    { id: 'lena',   name: 'Lena Choi',     ini: 'LC', color: 'var(--c-lena)' },
+    { id: 'marcus', name: 'Marcus Webb',   ini: 'MW', color: 'var(--c-marcus)' },
+    { id: 'ava',    name: 'Ava Torres',    ini: 'AT', color: 'var(--c-ava)' }
   ];
   function personById(id) {
     for (var i = 0; i < PEOPLE.length; i++) if (PEOPLE[i].id === id) return PEOPLE[i];
@@ -1925,8 +2045,13 @@
 
   // What an invite-row's label expands to — an individual, or every member of a group.
   var INVITE_ROW_MEMBERS = {
-    Adam: ['adam'], Maya: ['maya'], Jordan: ['jordan'],
-    'Road Trip Crew': ['priya', 'theo', 'nina']
+    Adam: ['adam'], Maya: ['maya'], Jordan: ['jordan'], Priya: ['priya'], Theo: ['theo'],
+    Nina: ['nina'], Sam: ['sam'], Lena: ['lena'], Marcus: ['marcus'], Ava: ['ava'],
+    'Road Trip Crew': ['priya', 'theo', 'nina'],
+    'Wedding Party Mix': ['jordan', 'nina', 'theo'],
+    'Mystery Podcast Crew': ['sam', 'lena', 'jordan'],
+    '3am Club Crawlers': ['marcus', 'ava', 'adam'],
+    'Work Besties': ['priya', 'sam', 'maya']
   };
 
   var JAMS_ROSTER = {
@@ -2050,6 +2175,13 @@
     if (isJoinedJam(key)) people.push({ name: 'You', ini: 'KM', color: 'var(--c-you)', role: 'Listening' });
     jam.guests.forEach(function (g) { people.push({ name: g.name, ini: g.ini, color: g.color, role: 'Listening' }); });
     (jam.invited || []).forEach(function (g) { people.push({ name: g.name, ini: g.ini, color: g.color, role: 'Invited' }); });
+    // Defensive: a name should only ever appear once, whichever role it last landed in.
+    var seen = {};
+    people = people.filter(function (p) {
+      if (seen[p.name]) return false;
+      seen[p.name] = true;
+      return true;
+    });
     openPeopleModal({
       title: jam.title,
       sub: 'Listen and add songs together in real time, from anywhere.',
@@ -2079,16 +2211,27 @@
     var keys = Object.keys(JAMS_ROSTER);
     var key = keys[Math.floor(Math.random() * keys.length)];
     var jam = JAMS_ROSTER[key];
-    var taken = [jam.host.name].concat(jam.guests.map(function (g) { return g.name; }));
+    jam.invited = jam.invited || [];
+    // Someone can only be in one place at a time — exclude invitees too, or they'd show twice.
+    var taken = [jam.host.name]
+      .concat(jam.guests.map(function (g) { return g.name; }))
+      .concat(jam.invited.map(function (g) { return g.name; }));
     var available = DRIFTERS.filter(function (p) { return taken.indexOf(p.name) === -1; });
-    // Keep Jams between 2 and 4 people: grow when small, thin out when crowded.
-    var joining = jam.guests.length < 2 ? true
-      : jam.guests.length >= 3 ? false
-      : (available.length > 0 && Math.random() < 0.55);
-    if (joining && available.length) {
-      jam.guests.push(available[Math.floor(Math.random() * available.length)]);
-    } else if (jam.guests.length > 0) {
-      jam.guests.splice(Math.floor(Math.random() * jam.guests.length), 1);
+
+    // An invitee accepting moves them from Invited to Listening — never a second copy.
+    if (jam.invited.length && Math.random() < 0.6) {
+      var idx = Math.floor(Math.random() * jam.invited.length);
+      jam.guests.push(jam.invited.splice(idx, 1)[0]);
+    } else {
+      // Otherwise keep Jams between 2 and 4 people: grow when small, thin out when crowded.
+      var joining = jam.guests.length < 2 ? true
+        : jam.guests.length >= 3 ? false
+        : (available.length > 0 && Math.random() < 0.55);
+      if (joining && available.length) {
+        jam.guests.push(available[Math.floor(Math.random() * available.length)]);
+      } else if (jam.guests.length > 0) {
+        jam.guests.splice(Math.floor(Math.random() * jam.guests.length), 1);
+      }
     }
     renderJamCard(key);
     if (guestJamKey === key) renderGuestHostCard();
@@ -2653,7 +2796,7 @@
   }
   toggle.addEventListener('click', function () { setPanelOpen(panel.hidden); });
   document.getElementById('collabClose').addEventListener('click', function () { setPanelOpen(false); });
-  npQueueBtn.addEventListener('click', function () { setPanelOpen(panel.hidden); });
+  npQueueBtn.addEventListener('click', function () { if (panel.hidden) setPanelOpen(true); });
 
   /* ---------- modals ---------- */
   function openModal(id, context) {
@@ -2713,6 +2856,8 @@
   var jamStripStack = document.getElementById('jamStripStack');
   var jamLive = false;
   var jamFromChat = null;
+  // Every chat that was told a Jam started, so we can tell them again when it ends.
+  var notifiedJamChats = [];
   var hostRoster = [];
   var hostInviteLabels = [];
 
@@ -2796,6 +2941,7 @@
     activateJam();
     if (jamFromChat && notifyChats.indexOf(jamFromChat) === -1) notifyChats.push(jamFromChat);
     notifyChats.forEach(function (key) { pushSystem(key, 'You started a Jam'); });
+    notifiedJamChats = notifyChats.slice();
     jamFromChat = null;
     clearInviteSelection();
     closeModal('inviteModal');
@@ -2811,17 +2957,24 @@
     activateJam();
     selectPane('jams');
     pushSystem(chatKey, 'You started a Jam with this chat');
+    notifiedJamChats = [chatKey];
   }
 
   // Inviting more people into a Jam that is already live, rather than starting a new one.
   function inviteToJam() {
     var notifyChats = collectCheckedInvites();
     renderJamInviteState();
-    notifyChats.forEach(function (key) { pushSystem(key, 'You invited them to your Jam'); });
+    notifyChats.forEach(function (key) {
+      pushSystem(key, 'You invited them to your Jam');
+      if (notifiedJamChats.indexOf(key) === -1) notifiedJamChats.push(key);
+    });
     clearInviteSelection();
     closeModal('inviteModal');
   }
   function endJam() {
+    // Whoever was told the Jam started should hear that it ended too.
+    notifiedJamChats.forEach(function (key) { pushSystem(key, 'Your Jam has ended'); });
+    notifiedJamChats = [];
     jamLive = false;
     hostRoster = [];
     hostInviteLabels = [];
@@ -2845,6 +2998,7 @@
   function clearInviteSelection() {
     document.querySelectorAll('.invite-row').forEach(function (r) { r.classList.remove('checked'); });
     inviteSearch.value = '';
+    syncInviteSearchClear();
     filterInviteRows();
   }
 
@@ -2890,7 +3044,15 @@
       inviteEmpty.classList.remove('show');
     }
   }
-  inviteSearch.addEventListener('input', filterInviteRows);
+  var inviteSearchClear = document.getElementById('inviteSearchClear');
+  function syncInviteSearchClear() { inviteSearchClear.classList.toggle('show', !!inviteSearch.value); }
+  inviteSearch.addEventListener('input', function () { syncInviteSearchClear(); filterInviteRows(); });
+  inviteSearchClear.addEventListener('click', function () {
+    inviteSearch.value = '';
+    syncInviteSearchClear();
+    filterInviteRows();
+    inviteSearch.focus();
+  });
 
   function openInviteModal(fromSetup) {
     modalStartBtn.textContent = jamLive ? 'Invite to Jam' : 'Start Jam';
@@ -3430,7 +3592,17 @@
     'jam later?',
     'best song on the record'
   ];
+  // Simulated activity has to stop somewhere, or a long-open tab racks up an absurd unread count.
+  var incomingMessageCount = 0;
+  var INCOMING_MESSAGE_LIMIT = 40;
+  var incomingMessageTimer = setInterval(deliverIncomingMessage, 9000);
+
   function deliverIncomingMessage() {
+    if (incomingMessageCount >= INCOMING_MESSAGE_LIMIT) {
+      clearInterval(incomingMessageTimer);
+      return;
+    }
+    incomingMessageCount++;
     var keys = ORDER.filter(function (k) { return (CHATS[k].members || []).length; });
     if (!keys.length) return;
     var key = keys[Math.floor(Math.random() * keys.length)];
@@ -3455,7 +3627,6 @@
     renderChatList();
     refreshUnread();
   }
-  setInterval(deliverIncomingMessage, 9000);
 
   /* ---------- transient status toast ---------- */
   var toastEl = document.getElementById('toast');
