@@ -709,6 +709,14 @@
   .jams-join-head .join-btn { display: inline-flex; align-items: center; gap: 6px; }
   .jams-join-head .join-btn[hidden] { display: none; }
 
+  .toast {
+    position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%);
+    background: var(--accent); color: #04220f; font-size: 12.5px; font-weight: 700;
+    padding: 10px 16px; border-radius: 6px; z-index: 80; box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    max-width: 70%; text-align: center;
+  }
+  .toast[hidden] { display: none; }
+
   /* Track context menu */
   .ctx-menu {
     position: absolute; z-index: 70; width: 218px;
@@ -727,6 +735,22 @@
   .ctx-divider { height: 1px; background: rgba(255,255,255,.1); margin: 4px 0; }
 
   /* Read-only Jam settings (viewing the host's configuration) */
+  .nearby-note {
+    font-size: 11.5px; color: var(--text-tertiary); line-height: 1.5;
+    margin: 0; padding: 0 8px 6px;
+  }
+  .modal-back {
+    width: 28px; height: 28px; border-radius: 50%; border: none; background: transparent;
+    color: var(--text-secondary); font-size: 19px; cursor: pointer; flex: none;
+    display: flex; align-items: center; justify-content: center; margin-right: 2px;
+  }
+  .modal-back[hidden] { display: none; }
+  .modal-back:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .modal-header .modal-title { flex: 1; }
+  .people-row-role.invited {
+    display: inline-block; border: 1px solid var(--border-strong); border-radius: 9px;
+    padding: 1px 8px; color: var(--text-secondary); font-size: 11px; margin-top: 3px;
+  }
   .settings-readonly-note {
     display: none; font-size: 11.5px; color: var(--text-tertiary);
     padding: 0 17px 4px; margin: 0;
@@ -1511,6 +1535,8 @@
       </div>
     </div>
 
+    <div class="toast" id="toast" hidden></div>
+
     <!-- Track context menu -->
     <div class="ctx-menu" id="ctxMenu" hidden>
       <button class="ctx-item">Add to playlist <span class="ctx-sub">&#8250;</span></button>
@@ -1540,6 +1566,7 @@
     <div class="modal-overlay" id="inviteModal">
       <div class="modal-card">
         <div class="modal-header">
+          <button class="modal-back" id="inviteBackBtn" aria-label="Back to Jam settings" hidden>&#8249;</button>
           <p class="modal-title">Invite friends to your Jam</p>
           <button class="modal-close" data-close="inviteModal" aria-label="Close">&#10005;</button>
         </div>
@@ -1548,7 +1575,7 @@
           <input id="inviteSearch" placeholder="Search friends" aria-label="Search friends">
         </div>
         <div class="modal-scroll" id="inviteScroll">
-          <div class="modal-section-label">Active Users</div>
+          <div class="modal-section-label">Active Friends</div>
           <div class="invite-row" data-invite="Adam" data-count="1" data-chat="adam">
             <div class="avatar" style="background:var(--c-adam);">AW</div>
             <div class="invite-info">
@@ -1594,6 +1621,7 @@
             <div class="nearby-text">Auto-invite people nearby</div>
             <div class="qr-box"><div class="qr-grid" id="qrGrid"></div></div>
           </div>
+          <p class="nearby-note" id="nearbyNote">Copy and share the link with your friends, or ask them to scan the QR code.</p>
           <p class="invite-empty" id="inviteEmpty">No friends match that search.</p>
         </div>
         <div class="modal-footer">
@@ -1610,7 +1638,7 @@
     <div class="modal-overlay" id="settingsModal">
       <div class="modal-card" id="settingsCard">
         <div class="modal-header">
-          <p class="modal-title">Jam settings</p>
+          <p class="modal-title" id="settingsTitle">Jam settings</p>
           <button class="modal-close" data-close="settingsModal" aria-label="Close">&#10005;</button>
         </div>
         <p class="settings-readonly-note" id="settingsReadonlyNote">Set by the host &mdash; only they can change these.</p>
@@ -1904,6 +1932,7 @@
       host: { name: 'Nina Patel', ini: 'NP', color: 'var(--c-nina)' },
       guests: [{ name: 'Jordan Ruiz', ini: 'JR', color: 'var(--c-jordan)' }],
       settings: { join: 'Invited only', queue: 'Host only', feeds: true, guestInvite: true },
+      invited: [{ name: 'Adam Whitaker', ini: 'AW', color: 'var(--c-adam)' }],
       recent: [
         { title: 'Glue', artist: 'Bicep', art: 'linear-gradient(135deg,#2a3a5c,#4a6a9b)' },
         { title: 'So We Won’t Forget', artist: 'Khruangbin', art: 'linear-gradient(135deg,#6b4a2a,#a8783e)' }
@@ -1921,6 +1950,7 @@
       host: { name: 'Maya Chen', ini: 'MC', color: 'var(--c-maya)' },
       guests: [{ name: 'Theo Brandt', ini: 'TB', color: 'var(--c-theo)' }],
       settings: { join: 'Anyone with the link', queue: 'Everyone', feeds: true, guestInvite: true },
+      invited: [],
       recent: [
         { title: 'Houdini', artist: 'Dua Lipa', art: 'linear-gradient(135deg,#5c2a4a,#a8447f)' }
       ],
@@ -1952,7 +1982,7 @@
       row.appendChild(a);
       var info = el('div', 'people-row-info');
       info.appendChild(el('div', 'people-row-name', p.name));
-      info.appendChild(el('div', 'people-row-role', p.role));
+      info.appendChild(el('div', 'people-row-role' + (p.role === 'Invited' ? ' invited' : ''), p.role));
       row.appendChild(info);
       list.appendChild(row);
     });
@@ -1980,6 +2010,13 @@
     return !!currentJoinedBtn && currentJoinedBtn.closest('.jam-card').dataset.jam === key;
   }
 
+  // A private Jam that still shows in friends' feeds can be asked to join, not just joined.
+  function needsRequest(key) {
+    var jam = JAMS_ROSTER[key];
+    return !!jam && jam.settings.join === 'Invited only' && jam.settings.feeds;
+  }
+  function joinLabelFor(key) { return needsRequest(key) ? 'Request to Join' : 'Join'; }
+
   // The card's avatars and listener count are derived, so they follow people coming and going.
   function renderJamCard(key) {
     var card = document.querySelector('.jam-card[data-jam="' + key + '"]');
@@ -1995,6 +2032,11 @@
     line.innerHTML = '';
     line.appendChild(el('span', 'live-dot'));
     line.appendChild(document.createTextNode(' ' + people.length + ' listening · ' + jam.note));
+    var btn = card.querySelector('.join-btn');
+    btn.dataset.default = joinLabelFor(key);
+    if (!btn.classList.contains('joined') && !btn.classList.contains('requested')) {
+      btn.textContent = btn.dataset.default;
+    }
   }
 
   function openJamPeopleModal(key) {
@@ -2003,6 +2045,7 @@
     var people = [{ name: jam.host.name, ini: jam.host.ini, color: jam.host.color, role: 'Host' }];
     if (isJoinedJam(key)) people.push({ name: 'You', ini: 'KM', color: 'var(--c-you)', role: 'Listening' });
     jam.guests.forEach(function (g) { people.push({ name: g.name, ini: g.ini, color: g.color, role: 'Listening' }); });
+    (jam.invited || []).forEach(function (g) { people.push({ name: g.name, ini: g.ini, color: g.color, role: 'Invited' }); });
     openPeopleModal({
       title: jam.title,
       sub: 'Listen and add songs together in real time, from anywhere.',
@@ -2307,7 +2350,7 @@
       people: people,
       foot: 'People in the Jam can see your username and profile picture.',
       inviteVisible: true,
-      onInvite: function () { jamFromChat = key; convo.classList.remove('show'); selectPane('jams'); openInviteModal(); },
+      onInvite: function () { jamFromChat = key; convo.classList.remove('show'); selectPane('jams'); openJamSetup(); },
       actionLabel: 'Start Jam',
       onAction: function () { convo.classList.remove('show'); startJamWithChat(key); }
     });
@@ -2666,21 +2709,47 @@
       if (r.dataset.chat) notifyChats.push(r.dataset.chat);
       (INVITE_ROW_MEMBERS[r.dataset.invite] || []).forEach(function (id) {
         var p = personById(id);
-        if (p && !hostRoster.some(function (h) { return h.id === id; })) hostRoster.push(p);
+        if (p && !hostRoster.some(function (h) { return h.id === id; })) {
+          // Copy rather than share the PEOPLE record, since status is per-Jam.
+          hostRoster.push({ id: p.id, name: p.name, ini: p.ini, color: p.color, status: 'invited' });
+        }
       });
     });
     return notifyChats;
   }
 
-  // A group counts as everyone in it, so the headcount can exceed the number of invites.
-  function renderJamInviteState() {
-    var headcount = hostRoster.length;
-    jamSubtitle.textContent = 'You’re hosting · ' + (headcount ? headcount + ' invited' : 'open to friends');
-    jamLiveText.textContent = hostInviteLabels.length
-      ? 'Live — invited ' + hostInviteLabels.join(', ') + (headcount > hostInviteLabels.length ? ' · ' + headcount + ' people' : '')
-      : 'Live — waiting for friends to join';
-    showJamStrip(jamNameEl.textContent, hostRoster.length ? hostRoster : [{ ini: 'KM', color: 'var(--c-you)' }]);
+  function listeningRoster() {
+    return hostRoster.filter(function (p) { return p.status === 'listening'; });
   }
+  function invitedRoster() {
+    return hostRoster.filter(function (p) { return p.status !== 'listening'; });
+  }
+
+  // Invited people only count once they accept, so the two numbers are shown apart.
+  function renderJamInviteState() {
+    var listening = listeningRoster().length, invited = invitedRoster().length;
+    var parts = [];
+    if (listening) parts.push((listening + 1) + ' listening');
+    if (invited) parts.push(invited + ' invited');
+    jamSubtitle.textContent = 'You’re hosting · ' + (parts.length ? parts.join(' · ') : 'open to friends');
+    jamLiveText.textContent = hostInviteLabels.length
+      ? 'Live — ' + (listening ? listening + ' joined of ' : 'invited ') + hostInviteLabels.join(', ')
+      : 'Live — waiting for friends to join';
+    var strip = [{ ini: 'KM', color: 'var(--c-you)' }].concat(listeningRoster());
+    showJamStrip(jamNameEl.textContent, strip);
+  }
+
+  // Invitees accept over time, the way they would in a live Jam.
+  function acceptPendingInvite() {
+    if (!jamLive) return;
+    var pending = invitedRoster();
+    if (!pending.length) return;
+    var p = pending[Math.floor(Math.random() * pending.length)];
+    p.status = 'listening';
+    renderJamInviteState();
+    pushToast(p.name.split(' ')[0] + ' joined your Jam');
+  }
+  setInterval(acceptPendingInvite, 7000);
 
   function showJamStrip(name, people) {
     jamStripName.textContent = name;
@@ -2808,8 +2877,9 @@
   }
   inviteSearch.addEventListener('input', filterInviteRows);
 
-  function openInviteModal() {
+  function openInviteModal(fromSetup) {
     modalStartBtn.textContent = jamLive ? 'Invite to Jam' : 'Start Jam';
+    inviteBackBtn.hidden = !fromSetup;
     clearInviteSelection();
     openModal('inviteModal');
   }
@@ -2817,7 +2887,8 @@
   jamLiveRow.addEventListener('click', function () {
     if (guestJamKey) { openJamPeopleModal(guestJamKey); return; }
     var people = [{ name: 'You', ini: 'KM', color: 'var(--c-you)', role: 'Host' }]
-      .concat(hostRoster.map(function (p) { return { name: p.name, ini: p.ini, color: p.color, role: 'Listening' }; }));
+      .concat(listeningRoster().map(function (p) { return { name: p.name, ini: p.ini, color: p.color, role: 'Listening' }; }))
+      .concat(invitedRoster().map(function (p) { return { name: p.name, ini: p.ini, color: p.color, role: 'Invited' }; }));
     openPeopleModal({
       title: 'People in this Jam',
       sub: 'Listen and add songs together in real time, from anywhere.',
@@ -2841,7 +2912,7 @@
       openModal('leaveGuestJamModal');
       return;
     }
-    openInviteModal();
+    openJamSetup();
   });
   document.getElementById('confirmEndJamBtn').addEventListener('click', function () {
     endJam();
@@ -2878,7 +2949,29 @@
   var ownSettings = readSettingsFromModal();
   var ownJamName = jamNameInput.value;
 
+  var settingsTitle = document.getElementById('settingsTitle');
+  var saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  var inviteBackBtn = document.getElementById('inviteBackBtn');
+  var settingsMode = 'edit';
+
+  // Step one of starting a Jam: set it up, then move on to picking who's in it.
+  function openJamSetup() {
+    settingsMode = 'setup';
+    applySettingsToModal(ownJamName, ownSettings);
+    settingsCard.classList.remove('readonly');
+    settingsTitle.textContent = 'Start a Jam';
+    saveSettingsBtn.textContent = 'Next: invite friends';
+    openModal('settingsModal');
+  }
+  inviteBackBtn.addEventListener('click', function () {
+    closeModal('inviteModal');
+    openJamSetup();
+  });
+
   document.getElementById('jamSettingsBtn').addEventListener('click', function () {
+    settingsMode = guestJamKey ? 'readonly' : 'edit';
+    settingsTitle.textContent = 'Jam settings';
+    saveSettingsBtn.textContent = 'Save settings';
     if (guestJamKey) {
       var jam = JAMS_ROSTER[guestJamKey];
       applySettingsToModal(jam.title, jam.settings);
@@ -2891,13 +2984,15 @@
     }
     openModal('settingsModal');
   });
-  document.getElementById('saveSettingsBtn').addEventListener('click', function () {
+  saveSettingsBtn.addEventListener('click', function () {
     ownSettings = readSettingsFromModal();
     ownJamName = jamNameInput.value || "Kennedy's Jam";
     if (jamLive) jamNameEl.textContent = ownJamName;
     closeModal('settingsModal');
+    // In setup this button is a "next", so hand straight over to the invite step.
+    if (settingsMode === 'setup') { settingsMode = 'edit'; openInviteModal(true); }
   });
-  document.getElementById('inviteMoreBtn').addEventListener('click', openInviteModal);
+  document.getElementById('inviteMoreBtn').addEventListener('click', function () { openInviteModal(false); });
   function appendQueueRow(track) {
     var row = el('div', 'queue-row');
     var art = el('div', 'queue-art');
@@ -3190,7 +3285,7 @@
 
   startJamPill.addEventListener('click', function () {
     if (!isPremium) { openModal('upsellModal', 'jam'); return; }
-    openInviteModal();
+    openJamSetup();
   });
 
   function actuallyJoin(btn) {
@@ -3212,6 +3307,21 @@
         var jamName = btn.closest('.jam-card').querySelector('.jam-names').textContent;
         document.getElementById('leaveGuestJamTitle').textContent = 'Leave ' + jamName + '?';
         openModal('leaveGuestJamModal');
+        return;
+      }
+      var key = btn.closest('.jam-card').dataset.jam;
+      // A private-but-discoverable Jam has to be asked; the host answers a moment later.
+      if (needsRequest(key) && !btn.classList.contains('approved')) {
+        if (btn.classList.contains('requested')) return;
+        btn.classList.add('requested');
+        btn.textContent = 'Requested';
+        setTimeout(function () {
+          btn.classList.remove('requested');
+          btn.classList.add('approved');
+          btn.textContent = 'Join';
+          btn.dataset.default = 'Join';
+          pushToast(JAMS_ROSTER[key].host.name.split(' ')[0] + ' let you into ' + JAMS_ROSTER[key].title);
+        }, 2600);
         return;
       }
       var targetName = btn.closest('.jam-card').querySelector('.jam-names').textContent;
@@ -3286,6 +3396,16 @@
     if (!isPremium && jamLive) endJam();
   }
   planToggle.addEventListener('click', function () { isPremium = !isPremium; applyPlan(); });
+
+  /* ---------- transient status toast ---------- */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function pushToast(text) {
+    toastEl.textContent = text;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 3200);
+  }
 
   /* ---------- QR placeholder ---------- */
   var qrPattern = '111010111101000101111010111000010000101101010010010101111001010101010100111001011';
