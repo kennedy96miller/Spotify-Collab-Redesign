@@ -326,6 +326,7 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     display: flex; align-items: center; gap: 5px;
   }
+  .chat-preview > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .chat-row.unread .chat-name { color: var(--text-primary); }
   .chat-row.unread .chat-preview { color: var(--text-primary); font-weight: 500; }
   .chat-badge {
@@ -365,6 +366,9 @@
   }
   .mini-btn:hover { background: var(--bg-active); color: var(--text-primary); }
   .mini-btn.liked { color: var(--heart); }
+  .mini-btn.requested { color: var(--accent); }
+  .activity-row:hover .row-actions .mini-btn.requested { opacity: 1; }
+  .row-actions .mini-btn.requested { opacity: 1; }
   .mini-btn.accent { color: var(--accent); }
 
   .convo-scroll { flex: 1 1 auto; overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 10px; }
@@ -1254,7 +1258,7 @@
                 <div class="activity-meta"><span class="genre-pill">EDM</span><span>now</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <button class="mini-btn jam-req-btn" data-person="adam" data-tt="Request a Jam"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg></button>
                 <button class="mini-btn msg-jump tt-right" data-chat="adam" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
@@ -1267,7 +1271,7 @@
                 <div class="activity-meta"><span class="genre-pill">Pop</span><span>in a Jam &middot; 2 listening</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <button class="mini-btn jam-req-btn" data-person="maya" data-tt="Request a Jam"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg></button>
                 <button class="mini-btn msg-jump tt-right" data-chat="maya" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
@@ -1310,7 +1314,7 @@
                 <div class="activity-meta"><span class="genre-pill">Electronic</span><span>45m ago</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                <button class="mini-btn jam-req-btn" data-person="jordan" data-tt="Request a Jam"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg></button>
                 <button class="mini-btn msg-jump tt-right" data-chat="jordan" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
@@ -1323,7 +1327,7 @@
                 <div class="activity-meta"><span class="genre-pill">R&amp;B</span><span>1h ago</span></div>
               </div>
               <div class="row-actions">
-                <button class="mini-btn react-btn liked" data-tt="React"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-8.8C1.2 8 3 5 6.3 5c2 0 3.4 1.1 4.2 2.4C11.3 6.1 12.7 5 14.7 5 18 5 19.8 8 18.3 11.2 16 15.6 12 20 12 20z"/></svg></button>
+                <button class="mini-btn jam-req-btn" data-person="priya" data-tt="Request a Jam"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18V5l10-2v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg></button>
                 <button class="mini-btn msg-jump tt-right" data-chat="roadtrip" data-tt="Message"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 5H4a1 1 0 00-1 1v9a1 1 0 001 1h3v4l4.5-4H20a1 1 0 001-1V6a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
@@ -1824,10 +1828,10 @@
 (function () {
   var CHATS = {
     roadtrip: {
-      name: 'Road Trip Crew', type: 'group', sub: 'Priya Nair, Theo Brandt, Nina Patel',
+      name: 'Road Trip Crew \ud83d\ude97', type: 'group', sub: 'Priya Nair, Theo Brandt, Nina Patel',
       members: ['priya','theo','nina'],
       people: [['PN','var(--c-priya)'],['TB','var(--c-theo)'],['NP','var(--c-nina)']],
-      time: '2m', unread: 3, preview: 'Nina: adding this to the playlist', jamTag: null,
+      time: '2m', ts: 2, unread: 3, preview: 'Nina: adding this to the playlist', jamTag: null,
       messages: [
         { from: 'Priya', color: 'var(--c-priya)', ini: 'PN', text: 'ok who is driving the aux this year' },
         { from: 'Theo', color: 'var(--c-theo)', ini: 'TB', text: 'not me, last year was a disaster' },
@@ -1840,7 +1844,7 @@
       name: 'Adam Whitaker', type: 'dm', sub: 'Listening to Tritonal', online: true,
       members: ['adam'],
       people: [['AW','var(--c-adam)']],
-      time: '12m', unread: 1, preview: 'you have to hear this', jamTag: null,
+      time: '12m', ts: 12, unread: 1, preview: 'you have to hear this', jamTag: null,
       messages: [
         { from: 'Adam', color: 'var(--c-adam)', ini: 'AW', text: 'found the remix I was talking about' },
         { from: 'Adam', color: 'var(--c-adam)', ini: 'AW', track: { title: 'Lifted – Mat Zo Remix', artist: 'Tritonal', art: 'linear-gradient(135deg,#2b3a6b,#4a5a9b)' } },
@@ -1852,7 +1856,7 @@
       name: 'Maya Chen', type: 'dm', sub: 'In a Jam · 2 listening', online: true,
       members: ['maya'],
       people: [['MC','var(--c-maya)']],
-      time: '1h', unread: 0, preview: 'jam later?', jamTag: 'In a Jam',
+      time: '1h', ts: 60, unread: 0, preview: 'jam later?', jamTag: 'In a Jam',
       messages: [
         { from: 'me', text: 'how was the show' },
         { from: 'Maya', color: 'var(--c-maya)', ini: 'MC', text: 'unreal. she opened with Feather' },
@@ -1861,10 +1865,10 @@
       ]
     },
     wedding: {
-      name: 'Wedding Party Mix', type: 'group', sub: 'Jordan Ruiz, Nina Patel, Theo Brandt',
+      name: 'Wedding Party Mix \ud83d\udc8d', type: 'group', sub: 'Jordan Ruiz, Nina Patel, Theo Brandt',
       members: ['jordan','nina','theo'],
       people: [['JR','var(--c-jordan)'],['NP','var(--c-nina)'],['TB','var(--c-theo)']],
-      time: 'Tue', unread: 0, preview: 'Jordan: found the first dance song', jamTag: null,
+      time: 'Tue', ts: 4320, unread: 0, preview: 'Jordan: found the first dance song', jamTag: null,
       messages: [
         { from: 'Jordan', color: 'var(--c-jordan)', ini: 'JR', text: 'found the first dance song' },
         { from: 'Jordan', color: 'var(--c-jordan)', ini: 'JR', track: { title: 'Cocoon', artist: 'Fred again..', art: 'linear-gradient(135deg,#3a5c47,#5f8f6f)' } },
@@ -1875,7 +1879,7 @@
       name: 'Jordan Ruiz', type: 'dm', sub: 'Last seen 45m ago',
       members: ['jordan'],
       people: [['JR','var(--c-jordan)']],
-      time: 'Mon', unread: 0, preview: 'that set was unreal', jamTag: null,
+      time: 'Mon', ts: 5760, unread: 0, preview: 'that set was unreal', jamTag: null,
       messages: [
         { from: 'Jordan', color: 'var(--c-jordan)', ini: 'JR', text: 'that set was unreal' },
         { from: 'me', text: 'the Fred again.. run at the end especially' }
@@ -1946,7 +1950,7 @@
     },
     maya: {
       title: "Maya's Jam",
-      note: 'open to anyone',
+      note: 'hosted by Maya',
       host: { name: 'Maya Chen', ini: 'MC', color: 'var(--c-maya)' },
       guests: [{ name: 'Theo Brandt', ini: 'TB', color: 'var(--c-theo)' }],
       settings: { join: 'Anyone with the link', queue: 'Everyone', feeds: true, guestInvite: true },
@@ -2093,7 +2097,18 @@
 
   /* ---------- chat list ---------- */
   var chatList = document.getElementById('chatList');
+  // Most recent activity first, so a chat jumps to the top the moment it moves.
+  function sortChats() {
+    ORDER.sort(function (a, b) { return (CHATS[a].ts || 0) - (CHATS[b].ts || 0); });
+  }
+  // Mark a chat as just-active and float it up the list.
+  function touchChat(key) {
+    CHATS[key].ts = 0;
+    CHATS[key].time = 'now';
+    sortChats();
+  }
   function renderChatList() {
+    sortChats();
     chatList.innerHTML = '';
     ORDER.forEach(function (key) {
       var c = CHATS[key];
@@ -2171,7 +2186,7 @@
     if (!CHATS[key]) return;
     CHATS[key].messages.push({ system: true, text: text });
     CHATS[key].preview = text;
-    CHATS[key].time = 'now';
+    touchChat(key);
     if (activeChat === key && convo.classList.contains('show')) {
       convoScroll.appendChild(renderMessage({ system: true, text: text }));
       convoScroll.scrollTop = convoScroll.scrollHeight;
@@ -2280,7 +2295,7 @@
     convoScroll.appendChild(renderMessage(m, prev));
     convoScroll.scrollTop = convoScroll.scrollHeight;
     CHATS[activeChat].preview = m.track ? 'You: shared a track' : 'You: ' + m.text;
-    CHATS[activeChat].time = 'now';
+    touchChat(activeChat);
   }
 
   function sendMessage() {
@@ -2419,7 +2434,7 @@
     CHATS[key] = {
       name: p.name, type: 'dm', sub: 'No messages yet',
       members: [p.id],
-      people: [[p.ini, p.color]], time: 'now', unread: 0,
+      people: [[p.ini, p.color]], time: 'now', ts: 0, unread: 0,
       preview: 'Say hello', jamTag: null, messages: []
     };
     p.chat = key;
@@ -2586,7 +2601,7 @@
       sub: names.join(', '),
       members: added.map(function (p) { return p.id; }),
       people: added.map(function (p) { return [p.ini, p.color]; }),
-      time: 'now', unread: 0, preview: 'You created this group', jamTag: null,
+      time: 'now', ts: 0, unread: 0, preview: 'You created this group', jamTag: null,
       messages: []
     };
     ORDER.unshift(key);
@@ -3365,10 +3380,17 @@
     npPlayIcon.innerHTML = playing ? PLAY_ICON : PAUSE_ICON;
   });
 
-  document.querySelectorAll('.react-btn').forEach(function (btn) {
+  // Asking a friend to Jam, rather than reacting to what they're playing.
+  document.querySelectorAll('.jam-req-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var on = btn.classList.toggle('liked');
-      btn.querySelector('svg').setAttribute('fill', on ? 'currentColor' : 'none');
+      if (!isPremium) { openModal('upsellModal', 'jam'); return; }
+      if (btn.classList.contains('requested')) return;
+      var p = personById(btn.dataset.person);
+      if (!p) return;
+      btn.classList.add('requested', 'accent');
+      btn.dataset.tt = 'Jam requested';
+      pushToast('Asked ' + p.name.split(' ')[0] + ' to Jam');
+      if (p.chat && CHATS[p.chat]) pushSystem(p.chat, 'You asked ' + p.name.split(' ')[0] + ' to Jam');
     });
   });
 
@@ -3396,6 +3418,44 @@
     if (!isPremium && jamLive) endJam();
   }
   planToggle.addEventListener('click', function () { isPremium = !isPremium; applyPlan(); });
+
+  /* ---------- messages arriving while you watch ---------- */
+  var INCOMING_LINES = [
+    'ok this one is unreal \ud83d\udd25',
+    'put this on the queue',
+    'wait who added this',
+    'this is the one',
+    'skip skip skip',
+    'adding one more then I\u2019m done I promise',
+    'jam later?',
+    'best song on the record'
+  ];
+  function deliverIncomingMessage() {
+    var keys = ORDER.filter(function (k) { return (CHATS[k].members || []).length; });
+    if (!keys.length) return;
+    var key = keys[Math.floor(Math.random() * keys.length)];
+    var c = CHATS[key];
+    var from = personById(c.members[Math.floor(Math.random() * c.members.length)]);
+    if (!from) return;
+    var m = {
+      from: from.name.split(' ')[0], color: from.color, ini: from.ini,
+      text: INCOMING_LINES[Math.floor(Math.random() * INCOMING_LINES.length)]
+    };
+    var prev = c.messages[c.messages.length - 1];
+    c.messages.push(m);
+    c.preview = (c.type === 'group' ? m.from + ': ' : '') + m.text;
+    touchChat(key);
+    // Read it straight away if you're looking at that thread; otherwise it waits as unread.
+    if (activeChat === key && convo.classList.contains('show')) {
+      convoScroll.appendChild(renderMessage(m, prev));
+      convoScroll.scrollTop = convoScroll.scrollHeight;
+    } else {
+      c.unread = (c.unread || 0) + 1;
+    }
+    renderChatList();
+    refreshUnread();
+  }
+  setInterval(deliverIncomingMessage, 9000);
 
   /* ---------- transient status toast ---------- */
   var toastEl = document.getElementById('toast');
