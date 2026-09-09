@@ -189,71 +189,198 @@
   .tile-art { width: 56px; height: 56px; flex: none; }
   .tile-name { font-size: 13.5px; font-weight: 600; }
 
-  /* ---------- Now Playing view ---------- */
-  .npv { margin: -20px -24px 0; }
-  .npv-hero { position: relative; height: 340px; overflow: hidden; }
-  .npv-hero-bg {
-    position: absolute; inset: -6% -6%;
-    background: linear-gradient(120deg, #2a2f1e 0%, #4a3a2a 45%, #1e2a1a 100%);
-    background-size: 130% 130%;
-    animation: npvPan 22s ease-in-out infinite alternate;
+  /* ---------- Now Playing panel (right rail) ---------- */
+  .npv-panel {
+    width: 372px; flex: 0 0 auto;
+    background: var(--bg-panel); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; min-height: 0; position: relative;
+    --art-1: #7c5ce0; --art-2: #2fb98b; --art-3: #e0864a;
   }
-  @keyframes npvPan {
-    0% { background-position: 0% 20%; transform: scale(1.02); }
-    100% { background-position: 100% 80%; transform: scale(1.08); }
+  .npv-panel[hidden] { display: none; }
+  .npv-panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 300px; pointer-events: none;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--art-1) 26%, transparent) 0%, transparent 100%);
   }
-  @media (prefers-reduced-motion: reduce) { .npv-hero-bg { animation: none; } }
-  .npv-hero-fade {
+
+  .npv-head {
+    flex: 0 0 auto; position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 13px 8px 11px 16px;
+  }
+  .npv-head-text { min-width: 0; }
+  .npv-context {
+    font-size: 14px; font-weight: 700; margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .npv-context-sub { font-size: 11px; color: var(--text-tertiary); margin: 2px 0 0; }
+  .npv-head-btns { display: flex; align-items: center; flex: none; }
+  .npv-icon-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
+    color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 13px; position: relative;
+  }
+  .npv-icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+  .npv-scroll { flex: 1 1 auto; overflow-y: auto; padding: 0 16px 24px; position: relative; z-index: 1; }
+
+  /* Artwork */
+  .npv-art {
+    position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 18px 42px -14px rgba(0,0,0,.75);
+    background: #17131f;
+  }
+  .npv-art-layer { position: absolute; inset: -12%; }
+  .npv-art-layer.l1 {
+    background:
+      radial-gradient(60% 55% at 26% 22%, color-mix(in srgb, var(--art-1) 92%, #fff) 0%, transparent 62%),
+      radial-gradient(58% 60% at 78% 30%, var(--art-3) 0%, transparent 60%),
+      linear-gradient(160deg, #241a3d 0%, #12222a 100%);
+    animation: npvDrift 26s ease-in-out infinite alternate;
+  }
+  .npv-art-layer.l2 {
+    background:
+      radial-gradient(46% 46% at 68% 78%, color-mix(in srgb, var(--art-2) 85%, transparent) 0%, transparent 66%),
+      radial-gradient(38% 38% at 18% 82%, color-mix(in srgb, var(--art-1) 70%, transparent) 0%, transparent 68%);
+    mix-blend-mode: screen; opacity: .9;
+    animation: npvDrift2 19s ease-in-out infinite alternate;
+  }
+  .npv-art-grain {
     position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 78%, var(--bg-main) 100%);
+    background: repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 1px, transparent 1px 7px);
+    mix-blend-mode: overlay;
   }
-  .npv-close {
-    position: absolute; top: 14px; right: 14px; z-index: 2;
-    width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(0,0,0,.45);
-    color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  .npv-art-vig {
+    position: absolute; inset: 0; border-radius: inherit;
+    background: radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(0,0,0,.5) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.07);
   }
-  .npv-close:hover { background: rgba(0,0,0,.65); }
+  @keyframes npvDrift {
+    0% { transform: scale(1.04) translate3d(0,0,0); }
+    100% { transform: scale(1.12) translate3d(-3%,-2.5%,0); }
+  }
+  @keyframes npvDrift2 {
+    0% { transform: scale(1.1) translate3d(2%,1.5%,0); }
+    100% { transform: scale(1.02) translate3d(-2%,-1%,0); }
+  }
+  .npv-canvas-tag {
+    position: absolute; left: 10px; bottom: 10px; z-index: 2;
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+    border-radius: 20px; padding: 4px 10px 4px 8px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff;
+  }
+  .npv-canvas-tag .np-eq { height: 10px; color: var(--accent); }
+  .npv-canvas-tag .np-eq i { width: 2px; }
+
+  /* Title row */
   .npv-track-row {
-    position: absolute; left: 24px; right: 24px; bottom: 20px; z-index: 1;
-    display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    margin: 16px 0 0;
   }
-  .npv-eyebrow { font-size: 12.5px; color: rgba(255,255,255,.8); margin: 0 0 4px; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
-  .npv-title { font-size: 26px; font-weight: 800; margin: 0; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.4); text-wrap: balance; }
+  .npv-track-text { min-width: 0; }
+  .npv-title {
+    font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .npv-artist {
+    font-size: 13px; color: var(--text-secondary); margin: 3px 0 0; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .npv-artist:hover { color: var(--text-primary); text-decoration: underline; }
+  .npv-track-btns { display: flex; align-items: center; gap: 2px; flex: none; margin-top: 4px; }
   .npv-liked {
-    flex: none; width: 26px; height: 26px; border-radius: 50%; border: none;
-    background: var(--accent); color: #04220f; cursor: pointer; margin-bottom: 4px;
-    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
+    color: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative;
   }
-  .npv-liked.off { background: transparent; border: 1.5px solid rgba(255,255,255,.6); }
-  .npv-liked.off svg { display: none; }
-  .npv-section { padding: 22px 24px 4px; }
-  .npv-section h3 { font-size: 16px; font-weight: 700; margin: 0 0 12px; }
-  .npv-video-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .npv-liked.off { color: var(--text-secondary); }
+  .npv-liked.off .npv-heart-on { display: none; }
+  .npv-liked:not(.off) .npv-heart-off { display: none; }
+  .npv-liked:hover { color: var(--text-primary); }
+  .npv-liked:not(.off):hover { color: var(--accent); }
+
+  /* Listening-with strip — ties Now Playing back to the collab panel */
+  .npv-with {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px;
+    background: var(--bg-elevated); border-radius: 8px; padding: 9px 11px; cursor: pointer;
+  }
+  .npv-with:hover { background: var(--bg-hover); }
+  .npv-with-text { flex: 1 1 auto; min-width: 0; }
+  .npv-with-title { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .npv-with-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .npv-with-stack { flex: none; }
+  .npv-with-stack .avatar { width: 26px; height: 26px; font-size: 10px; }
+  .npv-with-caret { flex: none; color: var(--text-tertiary); font-size: 15px; }
+
+  /* Sections */
+  .npv-section { margin-top: 24px; }
+  .npv-section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 11px; }
+  .npv-section h3 { font-size: 15px; font-weight: 700; margin: 0; }
+  .npv-see-all { font-size: 11.5px; font-weight: 700; color: var(--text-tertiary); cursor: pointer; background: none; border: none; font-family: var(--font-ui); }
+  .npv-see-all:hover { color: var(--text-primary); text-decoration: underline; }
+
+  .npv-video-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
   .npv-video-card { cursor: pointer; }
   .npv-video-thumb {
-    height: 96px; border-radius: 6px; position: relative; margin-bottom: 8px;
+    aspect-ratio: 16 / 10; border-radius: 8px; position: relative; margin-bottom: 7px; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
   }
-  .npv-play {
-    width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.5);
-    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px;
-    opacity: 0; transition: opacity .12s;
+  .npv-video-thumb::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,.55) 100%);
   }
-  .npv-video-card:hover .npv-play { opacity: 1; }
-  .npv-video-title { font-size: 13px; font-weight: 600; }
-  .npv-video-sub { font-size: 11.5px; color: var(--text-tertiary); margin-top: 1px; }
-  .npv-artist-card { border-radius: 10px; overflow: hidden; background: var(--bg-elevated); margin-bottom: 20px; }
-  .npv-artist-banner { height: 120px; background: linear-gradient(135deg,#3a2f6b 0%,#7a5aa8 45%,#1e2a1a 100%); }
-  .npv-artist-body { padding: 16px 18px 20px; }
-  .npv-artist-name { font-size: 17px; font-weight: 800; }
-  .npv-artist-listeners { font-size: 12.5px; color: var(--text-tertiary); margin-top: 3px; }
-  .npv-artist-bio { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin: 10px 0 14px; max-width: 52ch; }
+  .npv-play {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--accent);
+    color: #04220f; display: flex; align-items: center; justify-content: center; font-size: 12px;
+    opacity: 0; transform: scale(.85); transition: opacity .14s, transform .14s; z-index: 2;
+  }
+  .npv-video-card:hover .npv-play { opacity: 1; transform: scale(1); }
+  .npv-video-len {
+    position: absolute; right: 6px; bottom: 6px; z-index: 2;
+    background: rgba(0,0,0,.62); border-radius: 4px; padding: 1px 5px;
+    font-size: 10px; font-weight: 600; color: #fff;
+  }
+  .npv-video-title { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .npv-video-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Credits */
+  .npv-credits { background: var(--bg-elevated); border-radius: 10px; padding: 14px 15px; }
+  .npv-credit-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 5px 0; }
+  .npv-credit-name { font-size: 12.5px; font-weight: 600; }
+  .npv-credit-role { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; }
+  .npv-credit-follow {
+    flex: none; border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary);
+    font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 14px; cursor: pointer; font-family: var(--font-ui);
+  }
+  .npv-credit-follow:hover { border-color: var(--text-primary); }
+
+  /* Artist card */
+  .npv-artist-card { border-radius: 10px; overflow: hidden; background: var(--bg-elevated); position: relative; }
+  .npv-artist-banner {
+    height: 152px; position: relative;
+    background:
+      radial-gradient(70% 80% at 30% 20%, #8b6ad8 0%, transparent 65%),
+      radial-gradient(60% 70% at 82% 62%, #d2794f 0%, transparent 62%),
+      linear-gradient(150deg,#2c2450 0%,#16281f 100%);
+  }
+  .npv-artist-banner::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, var(--bg-elevated) 100%);
+  }
+  .npv-artist-body { padding: 2px 16px 18px; position: relative; }
+  .npv-artist-name { font-size: 16.5px; font-weight: 800; }
+  .npv-artist-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 5px; }
+  .npv-artist-listeners { font-size: 12px; color: var(--text-tertiary); }
+  .npv-artist-bio { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 11px 0 0; }
   .npv-follow-btn {
-    border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary);
-    font-size: 12.5px; font-weight: 700; padding: 7px 18px; border-radius: 16px; cursor: pointer; font-family: var(--font-ui);
+    flex: none; border: 1px solid var(--border-strong); background: transparent; color: var(--text-primary);
+    font-size: 11.5px; font-weight: 700; padding: 6px 15px; border-radius: 15px; cursor: pointer; font-family: var(--font-ui);
   }
   .npv-follow-btn:hover { border-color: var(--text-primary); }
-  .npv-follow-btn.following { background: transparent; border-color: var(--border-strong); color: var(--accent); }
+  .npv-follow-btn.following { color: var(--accent); border-color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .npv-art-layer { animation: none; }
+  }
 
   /* ---------- Now playing ---------- */
   .nowbar {
@@ -1126,7 +1253,7 @@
 
       <!-- Main -->
       <div class="main">
-        <div id="mainDefault">
+        <div>
           <div class="announce-card">
             <div class="announce-art"></div>
             <div>
@@ -1149,59 +1276,108 @@
           </div>
         </div>
 
-        <!-- Now Playing view -->
-        <div class="npv" id="nowPlayingView" hidden>
-          <div class="npv-hero">
-            <div class="npv-hero-bg"></div>
-            <div class="npv-hero-fade"></div>
-            <button class="npv-close" id="npvCloseBtn" aria-label="Close Now Playing view">&#10005;</button>
-            <div class="npv-track-row">
-              <div class="npv-track-text">
-                <p class="npv-eyebrow">Cinnamon Chasers</p>
-                <h2 class="npv-title">Late September</h2>
-              </div>
-              <button class="npv-liked" id="npvLikedBtn" data-tt="Added to Liked Songs">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#04220f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- Now Playing panel -->
+      <div class="npv-panel" id="nowPlayingPanel" hidden>
+        <div class="npv-head">
+          <div class="npv-head-text">
+            <p class="npv-context">Summer Roadtrip</p>
+            <p class="npv-context-sub">Playlist &middot; Kennedy</p>
+          </div>
+          <div class="npv-head-btns">
+            <button class="npv-icon-btn" id="npvMoreBtn" data-tt="More options" aria-label="More options">&#8943;</button>
+            <button class="npv-icon-btn tt-right" id="npvCloseBtn" data-tt="Close" aria-label="Close Now Playing">&#10005;</button>
+          </div>
+        </div>
+
+        <div class="npv-scroll">
+          <div class="npv-art">
+            <div class="npv-art-layer l1"></div>
+            <div class="npv-art-layer l2"></div>
+            <div class="npv-art-grain"></div>
+            <div class="npv-art-vig"></div>
+            <div class="npv-canvas-tag"><span class="np-eq"><i></i><i></i><i></i></span> Canvas</div>
+          </div>
+
+          <div class="npv-track-row">
+            <div class="npv-track-text">
+              <h2 class="npv-title">Late September</h2>
+              <p class="npv-artist">Cinnamon Chasers</p>
+            </div>
+            <div class="npv-track-btns">
+              <button class="npv-liked tt-right" id="npvLikedBtn" data-tt="Added to Liked Songs" aria-pressed="true">
+                <svg class="npv-heart-on" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.7-9.4-9A5.2 5.2 0 0112 5.6 5.2 5.2 0 0121.4 12c-1.9 4.3-9.4 9-9.4 9z"/></svg>
+                <svg class="npv-heart-off" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 20.4S4.9 15.9 3.1 11.8A4.6 4.6 0 0112 6.4a4.6 4.6 0 018.9 5.4c-1.8 4.1-8.9 8.6-8.9 8.6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
               </button>
             </div>
           </div>
 
+          <div class="npv-with" id="npvWithRow" data-tt="Open the Jam in Collaborate">
+            <div class="npv-with-stack" id="npvWithStack"></div>
+            <div class="npv-with-text">
+              <div class="npv-with-title" id="npvWithTitle">Listening together</div>
+              <div class="npv-with-sub" id="npvWithSub">Open Jam</div>
+            </div>
+            <span class="npv-with-caret">&#8250;</span>
+          </div>
+
           <div class="npv-section">
-            <h3>Related music videos</h3>
+            <div class="npv-section-head">
+              <h3>Related music videos</h3>
+              <button class="npv-see-all">Show all</button>
+            </div>
             <div class="npv-video-row">
               <div class="npv-video-card">
-                <div class="npv-video-thumb" style="background:linear-gradient(135deg,#3a2f6b,#7a5aa8);">
+                <div class="npv-video-thumb" style="background:radial-gradient(70% 70% at 30% 25%,#8b6ad8,transparent 70%),linear-gradient(135deg,#3a2f6b,#20143a);">
                   <span class="npv-play">&#9658;</span>
+                  <span class="npv-video-len">3:41</span>
                 </div>
                 <div class="npv-video-title">Coasting</div>
                 <div class="npv-video-sub">Cinnamon Chasers</div>
               </div>
               <div class="npv-video-card">
-                <div class="npv-video-thumb" style="background:linear-gradient(135deg,#1a3a2f,#3e8a6a);">
+                <div class="npv-video-thumb" style="background:radial-gradient(70% 70% at 68% 30%,#4fc79a,transparent 70%),linear-gradient(135deg,#1a3a2f,#0f2119);">
                   <span class="npv-play">&#9658;</span>
+                  <span class="npv-video-len">4:07</span>
                 </div>
                 <div class="npv-video-title">Yalta</div>
                 <div class="npv-video-sub">Cinnamon Chasers</div>
               </div>
-              <div class="npv-video-card">
-                <div class="npv-video-thumb" style="background:linear-gradient(135deg,#6b2a4a,#b8557f);">
-                  <span class="npv-play">&#9658;</span>
+            </div>
+          </div>
+
+          <div class="npv-section">
+            <div class="npv-section-head"><h3>Credits</h3><button class="npv-see-all">Show all</button></div>
+            <div class="npv-credits">
+              <div class="npv-credit-row">
+                <div>
+                  <div class="npv-credit-name">Cinnamon Chasers</div>
+                  <div class="npv-credit-role">Main artist</div>
                 </div>
-                <div class="npv-video-title">Prophecies</div>
-                <div class="npv-video-sub">Cinnamon Chasers</div>
+                <button class="npv-credit-follow">Follow</button>
+              </div>
+              <div class="npv-credit-row">
+                <div>
+                  <div class="npv-credit-name">Russell Devotion</div>
+                  <div class="npv-credit-role">Producer, Writer</div>
+                </div>
+                <button class="npv-credit-follow">Follow</button>
               </div>
             </div>
           </div>
 
           <div class="npv-section">
             <h3>About the artist</h3>
-            <div class="npv-artist-card">
+            <div class="npv-artist-card" style="margin-top:11px;">
               <div class="npv-artist-banner"></div>
               <div class="npv-artist-body">
                 <div class="npv-artist-name">Cinnamon Chasers</div>
-                <div class="npv-artist-listeners">842,110 monthly listeners</div>
-                <p class="npv-artist-bio">Chris Devotion's solo project, threading dreamy analog synths through slow-motion pop &mdash; a fixture of the "Late September" era of blog-house revival.</p>
-                <button class="npv-follow-btn" id="npvFollowBtn">Follow</button>
+                <div class="npv-artist-meta">
+                  <span class="npv-artist-listeners">842,110 monthly listeners</span>
+                  <button class="npv-follow-btn" id="npvFollowBtn">Follow</button>
+                </div>
+                <p class="npv-artist-bio">A solo project threading dreamy analog synths through slow-motion pop &mdash; a fixture of the &ldquo;Late September&rdquo; era of blog-house revival.</p>
               </div>
             </div>
           </div>
@@ -2932,11 +3108,13 @@
   var panel = document.getElementById('collabPanel');
   var toggle = document.getElementById('collabToggle');
   var npQueueBtn = document.getElementById('npQueueBtn');
+  // The two right rails share one slot: opening Collaborate closes Now Playing.
   function setPanelOpen(open) {
     panel.hidden = !open;
     toggle.classList.toggle('is-active', open);
     toggle.setAttribute('aria-pressed', String(open));
     npQueueBtn.classList.toggle('active', open);
+    if (open) setNowPlayingOpen(false);
   }
   toggle.addEventListener('click', function () { setPanelOpen(panel.hidden); });
   document.getElementById('collabClose').addEventListener('click', function () { setPanelOpen(false); });
@@ -3060,8 +3238,13 @@
     jamStripStack.innerHTML = '';
     jamStripStack.appendChild(avatarStack(people.map(function (p) { return [p.ini, p.color]; }), 'sm'));
     jamStrip.classList.add('show');
+    syncNowPlayingCompanions();
   }
-  function hideJamStrip() { jamStrip.classList.remove('show'); }
+  function hideJamStrip() { jamStrip.classList.remove('show'); syncNowPlayingCompanions(); }
+  // The strip can change before the Now Playing panel exists in scope, so this stays defensive.
+  function syncNowPlayingCompanions() {
+    if (nowPlayingPanel && !nowPlayingPanel.hidden) renderNowPlayingCompanions();
+  }
 
   // Hosting your own Jam means you can't also be a guest listening in someone else's.
   function dropGuestJam() { exitGuestJamView(); }
@@ -3725,22 +3908,50 @@
   }
   planToggle.addEventListener('click', function () { isPremium = !isPremium; applyPlan(); });
 
-  /* ---------- Now Playing view ---------- */
+  /* ---------- Now Playing panel ---------- */
   var nowPlayingBtn = document.getElementById('nowPlayingBtn');
-  var mainDefault = document.getElementById('mainDefault');
-  var nowPlayingView = document.getElementById('nowPlayingView');
+  var nowPlayingPanel = document.getElementById('nowPlayingPanel');
+  var npvWithRow = document.getElementById('npvWithRow');
+  var npvWithStack = document.getElementById('npvWithStack');
+  var npvWithTitle = document.getElementById('npvWithTitle');
+  var npvWithSub = document.getElementById('npvWithSub');
+
+  // Now Playing and Collaborate share the right rail, so opening one closes the other.
   function setNowPlayingOpen(open) {
-    mainDefault.hidden = open;
-    nowPlayingView.hidden = !open;
+    nowPlayingPanel.hidden = !open;
     nowPlayingBtn.classList.toggle('active', open);
     nowPlayingBtn.setAttribute('aria-pressed', String(open));
+    if (open) {
+      renderNowPlayingCompanions();
+      if (!panel.hidden) setPanelOpen(false);
+    }
   }
-  nowPlayingBtn.addEventListener('click', function () { setNowPlayingOpen(nowPlayingView.hidden); });
+  nowPlayingBtn.addEventListener('click', function () { setNowPlayingOpen(nowPlayingPanel.hidden); });
   document.getElementById('npvCloseBtn').addEventListener('click', function () { setNowPlayingOpen(false); });
 
+  // Mirrors whatever the Jam strip is showing, so the two rails never disagree about who's listening.
+  function renderNowPlayingCompanions() {
+    var live = jamStrip.classList.contains('show');
+    npvWithStack.innerHTML = '';
+    if (live) {
+      npvWithStack.innerHTML = jamStripStack.innerHTML;
+      npvWithTitle.textContent = jamStripName.textContent;
+      npvWithSub.textContent = 'Listening together — open the Jam';
+    } else {
+      npvWithStack.appendChild(avatarStack([['KM', 'var(--c-you)']], 'sm'));
+      npvWithTitle.textContent = 'Listening on your own';
+      npvWithSub.textContent = 'Start a Jam to play this together';
+    }
+  }
+  npvWithRow.addEventListener('click', function () {
+    setPanelOpen(true);
+    selectPane('jams');
+  });
+
   document.getElementById('npvLikedBtn').addEventListener('click', function () {
-    this.classList.toggle('off');
-    this.dataset.tt = this.classList.contains('off') ? 'Save to your Liked Songs' : 'Added to Liked Songs';
+    var off = this.classList.toggle('off');
+    this.setAttribute('aria-pressed', String(!off));
+    this.dataset.tt = off ? 'Save to your Liked Songs' : 'Added to Liked Songs';
   });
   document.getElementById('npvFollowBtn').addEventListener('click', function () {
     var following = this.classList.toggle('following');
