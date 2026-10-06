@@ -73,6 +73,8 @@
     padding: 0 16px;
     background: var(--bg-void);
     border-bottom: 1px solid var(--border);
+    opacity: 0.35;
+    pointer-events: none;
   }
   .nav-caret, .home-btn {
     width: 32px; height: 32px; border-radius: 50%;
@@ -153,6 +155,8 @@
     width: 244px; flex: 0 0 auto;
     background: var(--bg-void); border-right: 1px solid var(--border);
     padding: 14px 10px; overflow-y: auto;
+    opacity: 0.35;
+    pointer-events: none;
   }
   .sidebar h2 { font-size: 15px; margin: 4px 6px 10px; }
   .sidebar-tags { display: flex; gap: 6px; padding: 0 4px 12px; }
@@ -173,6 +177,8 @@
     flex: 1 1 auto; min-width: 0;
     background: linear-gradient(180deg,#1e1638 0%, var(--bg-main) 280px);
     overflow-y: auto; padding: 20px 24px 32px;
+    opacity: 0.35;
+    pointer-events: none;
   }
   .announce-card { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
   .announce-art { width: 56px; height: 56px; border-radius: 6px; flex: none; background: linear-gradient(135deg,#3a2f6b,#152a24); }
@@ -203,6 +209,8 @@
     background: var(--bg-panel); border-left: 1px solid var(--border);
     display: flex; flex-direction: column; min-height: 0; position: relative;
     --art-1: #7c5ce0; --art-2: #2fb98b; --art-3: #e0864a;
+    opacity: 0.35;
+    pointer-events: none;
   }
   .npv-panel[hidden] { display: none; }
   .npv-panel::before {
@@ -395,6 +403,8 @@
     height: 72px; flex: 0 0 auto;
     background: var(--bg-void); border-top: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 10px;
+    opacity: 0.35;
+    pointer-events: none;
   }
   .now-left { display: flex; align-items: center; gap: 12px; width: 220px; flex: none; min-width: 0; }
   .now-art { width: 46px; height: 46px; border-radius: 4px; flex: none; background: linear-gradient(135deg,#4a3a2a,#8a6a3a); }
@@ -457,6 +467,8 @@
     width: 372px; flex: 0 0 auto;
     background: var(--bg-panel); border-left: 1px solid var(--border);
     display: flex; flex-direction: column; min-height: 0; position: relative;
+    opacity: 1;
+    pointer-events: auto;
   }
   .collab-panel[hidden] { display: none; }
   /* Same top wash as the Now Playing rail, in the Jam accent, so the two panels
